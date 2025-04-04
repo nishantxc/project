@@ -1,4 +1,4 @@
-// components/TaskDrawer.tsx
+
 import { useState } from "react";
 import { Task, User } from "@/types/kanban";
 import {
@@ -61,7 +61,6 @@ export default function TaskDrawer({
   const [activeTab, setActiveTab] = useState("details");
   const [commentText, setCommentText] = useState("");
 
-  // Define tag style based on tagType
   const getTagStyle = (tagType: string) => {
     switch (tagType) {
       case "purple":
@@ -73,12 +72,10 @@ export default function TaskDrawer({
     }
   };
 
-  // Get user by ID
   const getUserById = (userId: string) => {
     return users.find((user) => user.id === userId);
   };
 
-  // Handle comment submission
   const handleAddComment = () => {
     if (commentText.trim()) {
       onAddComment(task.id, commentText);
@@ -86,7 +83,6 @@ export default function TaskDrawer({
     }
   };
 
-  // Handle user assignment
   const handleAssignUser = (taskId: string, userId: string) => {
     onAssignUser(taskId, userId);
   };
@@ -128,7 +124,7 @@ export default function TaskDrawer({
           </TabsList>
 
           <TabsContent value="details" className="mt-4 space-y-4">
-            {/* Progress */}
+            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700">Progress</div>
               <div className="w-full bg-gray-200 rounded-full h-2">
@@ -146,7 +142,7 @@ export default function TaskDrawer({
               <div className="text-xs text-gray-500">{task.progress}</div>
             </div>
 
-            {/* Assignees - Updated */}
+            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700 flex justify-between">
                 <span>Assignees</span>
@@ -228,7 +224,7 @@ export default function TaskDrawer({
               </div>
             </div>
 
-            {/* Dates */}
+            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700">Timeline</div>
               <div className="flex items-center text-xs text-gray-600">
@@ -241,7 +237,7 @@ export default function TaskDrawer({
               </div>
             </div>
 
-            {/* Attachments */}
+            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700 flex justify-between">
                 <span>Attachments ({task.attachments})</span>
@@ -269,7 +265,7 @@ export default function TaskDrawer({
           </TabsContent>
 
           <TabsContent value="comments" className="mt-4 space-y-4">
-            {/* Comments List - Updated */}
+            
             {task.comments > 0 ? (
               <div className="space-y-4">
                 {[...Array(task.comments)].map((_, i) => {
@@ -305,7 +301,7 @@ export default function TaskDrawer({
               <div className="text-sm text-gray-500">No comments yet</div>
             )}
 
-            {/* Add Comment - Updated */}
+            
             <div className="mt-4 space-y-2">
               <Textarea
                 placeholder="Add a comment..."
@@ -326,7 +322,7 @@ export default function TaskDrawer({
           </TabsContent>
 
           <TabsContent value="subtasks" className="mt-4 space-y-4">
-            {/* Subtasks List */}
+            
             {task.subtasks > 0 ? (
               <div className="space-y-2">
                 {[...Array(task.subtasks)].map((_, i) => (
@@ -361,7 +357,7 @@ export default function TaskDrawer({
               <div className="text-sm text-gray-500">No subtasks yet</div>
             )}
 
-            {/* Add Subtask */}
+            
             <Button variant="outline" size="sm" className="w-full">
               <Plus className="h-3 w-3 mr-1" />
               <span>Add Subtask</span>

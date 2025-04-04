@@ -1,4 +1,4 @@
-// components/TaskCard.tsx
+
 import { useState } from "react";
 import { Task, User } from "@/types/kanban";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -35,12 +35,12 @@ export default function TaskCard({
   const [dragStartTime, setDragStartTime] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  // Set up draggable with custom drag start/end handlers
+  
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id,
   });
 
-  // Custom drag handlers to track dragging state
+  
   const handleDragStart = () => {
     setIsDragging(true);
     setDragStartTime(Date.now());
@@ -50,9 +50,9 @@ export default function TaskCard({
     setIsDragging(false);
   };
 
-  // Handle card click to open drawer, but only if not dragging
+  
   const handleCardClick = (e: React.MouseEvent) => {
-    // If it was a short drag (effectively a click), open the drawer
+    
     const dragDuration = Date.now() - dragStartTime;
     if (!isDragging || dragDuration < 200) {
       setIsDrawerOpen(true);
@@ -60,13 +60,13 @@ export default function TaskCard({
     }
   };
 
-  // Apply transform styles
+  
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.8 : 1,
   };
 
-  // Get tag style based on tagType
+  
   const getTagStyle = (tagType: string) => {
     switch (tagType) {
       case "purple":
@@ -78,7 +78,7 @@ export default function TaskCard({
     }
   };
 
-  // Combine drag listeners with our custom handlers
+  
   const combinedListeners = {
     ...listeners,
     onDragStart: (e: any) => {
@@ -117,7 +117,7 @@ export default function TaskCard({
               className="text-gray-400 hover:text-gray-600"
               onClick={(e) => {
                 e.stopPropagation();
-                // Add menu handling here if needed
+                
               }}
             >
               <MoreVertical className="w-4 h-4" />

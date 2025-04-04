@@ -1,4 +1,4 @@
-// components/BoardColumn.tsx
+
 import { useState } from "react";
 import { BoardColumnProps, Column, Task, User } from "@/types/kanban";
 import { Button } from "@/components/ui/button";
@@ -19,12 +19,12 @@ export default function BoardColumn({
 }: BoardColumnProps & { users: User[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Set up droppable
+  
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   });
 
-  // Define column header icon colors
+  
   const getColumnColor = (columnId: string) => {
     switch (columnId) {
       case "todo":
@@ -42,7 +42,7 @@ export default function BoardColumn({
 
   return (
     <div className="w-full flex-shrink-0 flex flex-col h-full">
-      {/* Column Header */}
+      
       <div
         className={`flex items-center justify-between mb-3 p-2 rounded-lg ${getColumnColor(
           column.id
@@ -63,7 +63,7 @@ export default function BoardColumn({
         </button>
       </div>
 
-      {/* Add Task Button */}
+      
       <Button
         variant="ghost"
         className="mb-3 justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-dashed border-gray-300 bg-white text-sm"
@@ -73,7 +73,7 @@ export default function BoardColumn({
         <span className="truncate">Add New Task</span>
       </Button>
 
-      {/* Tasks - Droppable area */}
+      
       <div
         ref={setNodeRef}
         className={`space-y-3 overflow-y-auto flex-1 p-1 rounded-lg ${
@@ -90,7 +90,7 @@ export default function BoardColumn({
           />
         ))}
 
-        {/* Empty state for when there are no tasks */}
+        
         {tasks.length === 0 && (
           <div className="text-center p-3 text-gray-400 text-sm border border-dashed rounded-lg">
             No tasks in this column
@@ -98,7 +98,7 @@ export default function BoardColumn({
         )}
       </div>
 
-      {/* Task Modal */}
+      
       <TaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

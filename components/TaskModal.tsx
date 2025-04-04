@@ -1,4 +1,4 @@
-// components/TaskModal.tsx
+
 import { useState, useEffect } from "react";
 import { Task, TaskModalProps, User } from "@/types/kanban";
 import {
@@ -45,7 +45,7 @@ export default function TaskModal({
   task,
   users,
 }: TaskModalProps & { users: User[] }) {
-  // Default values for a new task - ensure assignees is initialized
+  
   const defaultTask = {
     title: "",
     description: "",
@@ -53,38 +53,38 @@ export default function TaskModal({
     tagType: "default",
     column: columnId,
     progress: "0/1",
-    assignees: [], // Initialize as empty array
+    assignees: [], 
     comments: 0,
     attachments: 0,
     subtasks: 0,
   };
 
-  // State for form values - ensure assignees is initialized
+  
   const [formValues, setFormValues] = useState<Omit<Task, "id">>({
     ...(task || defaultTask),
-    assignees: task?.assignees || [], // Initialize even if task exists
+    assignees: task?.assignees || [], 
     column: task?.column || columnId,
   });
 
-  // Reset form when modal opens or task changes - ensure assignees is initialized
+  
   useEffect(() => {
     if (isOpen) {
       setFormValues({
         ...(task || defaultTask),
-        assignees: task?.assignees || [], // Always initialize
+        assignees: task?.assignees || [], 
         column: task?.column || columnId,
       });
     }
   }, [isOpen, task, columnId]);
 
-  // Handle form submission
+  
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSave(formValues);
     onClose();
   };
 
-  // Handle input changes
+  
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -95,7 +95,7 @@ export default function TaskModal({
     }));
   };
 
-  // Handle select changes
+  
   const handleSelectChange = (name: string, value: string) => {
     setFormValues((prev) => ({
       ...prev,

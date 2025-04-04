@@ -20,7 +20,6 @@ import Header from "@/components/Header";
 import { v4 as uuidv4 } from "uuid";
 
 export default function KanbanBoard() {
-  // Sample data - in a real app, you'd fetch this from an API
   const [users] = useState<User[]>([
     {
       id: "1",
@@ -183,14 +182,12 @@ export default function KanbanBoard() {
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
-      // This configuration helps distinguish between clicks and drags
+
       activationConstraint: {
-        distance: 10, // Minimum distance before a drag starts (in px)
+        distance: 1
       },
     })
   );
-
-  // Group tasks by column
   const tasksGroupedByColumn = columns.map((column) => {
     const columnTasks = tasks.filter((task) => task.column === column.id);
     return {
@@ -198,23 +195,18 @@ export default function KanbanBoard() {
       tasks: columnTasks,
     };
   });
-
-  // Handle drag end event
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
 
     if (!over) return;
 
-    // Get the dragged task id and the target column id
     const taskId = active.id.toString();
     const targetColumnId = over.id.toString();
 
-    // Find the task being dragged
     const taskToMove = tasks.find((task) => task.id === taskId);
 
     if (!taskToMove || taskToMove.column === targetColumnId) return;
 
-    // Create a new tasks array with the updated column
     const updatedTasks = tasks.map((task) => {
       if (task.id === taskId) {
         return {
@@ -225,10 +217,8 @@ export default function KanbanBoard() {
       return task;
     });
 
-    // Update the tasks state
     setTasks(updatedTasks);
 
-    // Update column counts based on the updated tasks
     const updatedColumns = columns.map((column) => {
       const taskCount = updatedTasks.filter(
         (task) => task.column === column.id
@@ -241,19 +231,14 @@ export default function KanbanBoard() {
 
     setColumns(updatedColumns);
   };
-
-  // Add a function to handle adding new tasks
   const handleAddTask = (newTask: Omit<Task, "id">) => {
-    // Generate a unique ID for the new task
     const taskWithId: Task = {
       id: uuidv4(),
       ...newTask,
     };
 
-    // Add the new task to the tasks state
     setTasks([...tasks, taskWithId]);
 
-    // Update column counts
     const updatedColumns = columns.map((column) => {
       const taskCount =
         column.id === newTask.column
@@ -268,14 +253,11 @@ export default function KanbanBoard() {
 
     setColumns(updatedColumns);
   };
-
-  // Add these handlers in your KanbanBoard component
   const handleAddComment = (taskId: string, comment: string) => {
-    // Find the task to update
     const taskToUpdate = tasks.find((task) => task.id === taskId);
 
     if (taskToUpdate) {
-      // Create a new tasks array with the updated comment count
+
       const updatedTasks = tasks.map((task) => {
         if (task.id === taskId) {
           return {
@@ -286,17 +268,16 @@ export default function KanbanBoard() {
         return task;
       });
 
-      // Update the tasks state
+
       setTasks(updatedTasks);
     }
   };
 
   const handleAssignUser = (taskId: string, userId: string) => {
-    // Find the task to update
     const taskToUpdate = tasks.find((task) => task.id === taskId);
 
     if (taskToUpdate) {
-      // Create a new tasks array with the updated assignees
+
       const updatedTasks = tasks.map((task) => {
         if (task.id === taskId) {
           const assignees = task.assignees.includes(userId)
@@ -311,7 +292,7 @@ export default function KanbanBoard() {
         return task;
       });
 
-      // Update the tasks state
+
       setTasks(updatedTasks);
     }
   };
