@@ -57,9 +57,6 @@ export default function TaskDrawer({ isOpen, onClose, task }: TaskDrawerProps) {
             <div className={`text-xs px-2 py-1 rounded-md ${getTagStyle(task.tagType)}`}>
               {task.tag}
             </div>
-            <SheetClose className="rounded-full hover:bg-gray-100 p-1">
-              <X className="h-4 w-4" />
-            </SheetClose>
           </div>
           <SheetTitle className="text-xl font-bold mt-2">{task.title}</SheetTitle>
           <SheetDescription className="text-sm text-gray-600 mt-1">
