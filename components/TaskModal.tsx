@@ -1,6 +1,6 @@
 // components/TaskModal.tsx
 import { useState, useEffect } from "react";
-import { Task, TaskModalProps } from "@/types/kanban";
+import { Task, TaskModalProps, User } from "@/types/kanban";
 import {
   Dialog,
   DialogContent,
@@ -19,6 +19,23 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { ScrollArea } from "./ui/scroll-area";
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+} from "@/components/ui/command";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import { Check, ChevronsUpDown } from "lucide-react";
+import { cn } from "@/lib/utils";
+import { X } from "lucide-react";
 
 export default function TaskModal({
   isOpen,
@@ -26,8 +43,9 @@ export default function TaskModal({
   onSave,
   columnId,
   task,
-}: TaskModalProps) {
-  // Default values for a new task
+  users,
+}: TaskModalProps & { users: User[] }) {
+  // Default values for a new task - ensure assignees is initialized
   const defaultTask = {
     title: "",
     description: "",
@@ -35,21 +53,27 @@ export default function TaskModal({
     tagType: "default",
     column: columnId,
     progress: "0/1",
-    assignees: [],
+    assignees: [], // Initialize as empty array
     comments: 0,
     attachments: 0,
     subtasks: 0,
   };
 
-  // State for form values
-  const [formValues, setFormValues] = useState<Omit<Task, "id">>(
-    task ? { ...task } : defaultTask
-  );
+  // State for form values - ensure assignees is initialized
+  const [formValues, setFormValues] = useState<Omit<Task, "id">>({
+    ...(task || defaultTask),
+    assignees: task?.assignees || [], // Initialize even if task exists
+    column: task?.column || columnId,
+  });
 
-  // Reset form when modal opens or task changes
+  // Reset form when modal opens or task changes - ensure assignees is initialized
   useEffect(() => {
     if (isOpen) {
-      setFormValues(task ? { ...task } : { ...defaultTask, column: columnId });
+      setFormValues({
+        ...(task || defaultTask),
+        assignees: task?.assignees || [], // Always initialize
+        column: task?.column || columnId,
+      });
     }
   }, [isOpen, task, columnId]);
 
@@ -135,7 +159,9 @@ export default function TaskModal({
                 <Label htmlFor="tagType">Tag Style</Label>
                 <Select
                   value={formValues.tagType}
-                  onValueChange={(value) => handleSelectChange("tagType", value)}
+                  onValueChange={(value) =>
+                    handleSelectChange("tagType", value)
+                  }
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Select style" />
@@ -165,6 +191,116 @@ export default function TaskModal({
               <p className="text-xs text-gray-500">
                 Format: completed/total (e.g., 0/5)
               </p>
+            </div>
+
+            <div className="grid gap-2 mt-4">
+              <Label htmlFor="assignees">Assignees</Label>
+              <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    className="w-full justify-between"
+                  >
+                    {(formValues.assignees?.length || 0) > 0
+                      ? `${formValues.assignees?.length} user${
+                          (formValues.assignees?.length || 0) > 1 ? "s" : ""
+                        } selected`
+                      : "Select users"}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-full p-0">
+                  <Command>
+                    <CommandInput placeholder="Search users..." />
+                    <CommandEmpty>No users found.</CommandEmpty>
+                    <CommandGroup className="max-h-64 overflow-auto">
+                      {users.map((user) => (
+                        <CommandItem
+                          key={user.id}
+                          value={user.name}
+                          onSelect={() => {
+                            setFormValues((prev) => {
+                              const currentAssignees = prev.assignees || [];
+                              const newAssignees = currentAssignees.includes(
+                                user.id
+                              )
+                                ? currentAssignees.filter(
+                                    (id) => id !== user.id
+                                  )
+                                : [...currentAssignees, user.id];
+
+                              return {
+                                ...prev,
+                                assignees: newAssignees,
+                              };
+                            });
+                          }}
+                        >
+                          <div className="flex items-center gap-2">
+                            <Avatar className="h-6 w-6">
+                              <AvatarImage src={user.avatar} alt={user.name} />
+                              <AvatarFallback>
+                                {user.name.charAt(0)}
+                              </AvatarFallback>
+                            </Avatar>
+                            <div className="flex flex-col">
+                              <span>{user.name}</span>
+                              <span className="text-xs text-muted-foreground">
+                                {user.role}
+                              </span>
+                            </div>
+                          </div>
+                          <Check
+                            className={cn(
+                              "ml-auto h-4 w-4",
+                              (formValues.assignees || []).includes(user.id)
+                                ? "opacity-100"
+                                : "opacity-0"
+                            )}
+                          />
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+
+              {(formValues.assignees?.length || 0) > 0 && (
+                <div className="flex flex-wrap gap-1 mt-2">
+                  {(formValues.assignees || []).map((userId) => {
+                    const user = users.find((u) => u.id === userId);
+                    return (
+                      <div
+                        key={userId}
+                        className="flex items-center bg-gray-100 rounded-full px-2 py-1 text-xs"
+                      >
+                        <Avatar className="h-4 w-4 mr-1">
+                          <AvatarImage src={user?.avatar} alt={user?.name} />
+                          <AvatarFallback>
+                            {user?.name?.charAt(0) || userId.charAt(0)}
+                          </AvatarFallback>
+                        </Avatar>
+                        <span>{user?.name || `User ${userId}`}</span>
+                        <button
+                          type="button"
+                          className="ml-1 text-gray-500 hover:text-gray-700"
+                          onClick={() => {
+                            setFormValues((prev) => ({
+                              ...prev,
+                              assignees: (prev.assignees || []).filter(
+                                (id) => id !== userId
+                              ),
+                            }));
+                          }}
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </div>
 

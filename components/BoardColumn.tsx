@@ -1,23 +1,22 @@
 // components/BoardColumn.tsx
 import { useState } from "react";
-import { Column, Task } from "@/types/kanban";
+import { BoardColumnProps, Column, Task, User } from "@/types/kanban";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical } from "lucide-react";
 import TaskCard from "./TaskCard";
 import TaskModal from "./TaskModal";
 import { useDroppable } from "@dnd-kit/core";
 
-interface BoardColumnProps {
-  column: Column & { tasks: Task[] };
-  tasks: Task[];
-  onAddTask: (task: Omit<Task, "id">) => void;
-}
+
 
 export default function BoardColumn({
   column,
   tasks,
   onAddTask,
-}: BoardColumnProps) {
+  users,
+  onAddComment,
+  onAssignUser,
+}: BoardColumnProps & { users: User[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   // Set up droppable
@@ -29,15 +28,15 @@ export default function BoardColumn({
   const getColumnColor = (columnId: string) => {
     switch (columnId) {
       case "todo":
-        return "bg-red-300/50 text-red-500";
+        return "bg-red-300/50 text-red-800";
       case "progress":
-        return "bg-blue-300/50 text-blue-500";
+        return "bg-blue-300/50 text-blue-800";
       case "review":
-        return "bg-yellow-300/50 text-yellow-500";
+        return "bg-yellow-300/50 text-yellow-800";
       case "done":
-        return "bg-green-300/50 text-green-500";
+        return "bg-green-300/50 text-green-800";
       default:
-        return "bg-red-500/50 text-gray-500";
+        return "bg-red-500/50 text-gray-800";
     }
   };
 
@@ -82,7 +81,13 @@ export default function BoardColumn({
         }`}
       >
         {tasks.map((task) => (
-          <TaskCard key={task.id} task={task} />
+          <TaskCard
+            onAddComment={onAddComment}
+            onAssignUser={onAssignUser}
+            key={task.id}
+            task={task}
+            users={users}
+          />
         ))}
 
         {/* Empty state for when there are no tasks */}
@@ -99,6 +104,7 @@ export default function BoardColumn({
         onClose={() => setIsModalOpen(false)}
         onSave={onAddTask}
         columnId={column.id}
+        users={users}
       />
     </div>
   );

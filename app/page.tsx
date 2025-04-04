@@ -1,7 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { DndContext, DragEndEvent, PointerSensor,useSensors, useSensor, closestCorners } from "@dnd-kit/core";
+import {
+  DndContext,
+  DragEndEvent,
+  PointerSensor,
+  useSensors,
+  useSensor,
+  closestCorners,
+} from "@dnd-kit/core";
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
@@ -262,6 +269,53 @@ export default function KanbanBoard() {
     setColumns(updatedColumns);
   };
 
+  // Add these handlers in your KanbanBoard component
+  const handleAddComment = (taskId: string, comment: string) => {
+    // Find the task to update
+    const taskToUpdate = tasks.find((task) => task.id === taskId);
+
+    if (taskToUpdate) {
+      // Create a new tasks array with the updated comment count
+      const updatedTasks = tasks.map((task) => {
+        if (task.id === taskId) {
+          return {
+            ...task,
+            comments: task.comments + 1,
+          };
+        }
+        return task;
+      });
+
+      // Update the tasks state
+      setTasks(updatedTasks);
+    }
+  };
+
+  const handleAssignUser = (taskId: string, userId: string) => {
+    // Find the task to update
+    const taskToUpdate = tasks.find((task) => task.id === taskId);
+
+    if (taskToUpdate) {
+      // Create a new tasks array with the updated assignees
+      const updatedTasks = tasks.map((task) => {
+        if (task.id === taskId) {
+          const assignees = task.assignees.includes(userId)
+            ? task.assignees.filter((id) => id !== userId)
+            : [...task.assignees, userId];
+
+          return {
+            ...task,
+            assignees,
+          };
+        }
+        return task;
+      });
+
+      // Update the tasks state
+      setTasks(updatedTasks);
+    }
+  };
+
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -366,7 +420,10 @@ export default function KanbanBoard() {
                   key={column.id}
                   column={column}
                   tasks={column.tasks}
+                  users={users}
                   onAddTask={handleAddTask}
+                  onAddComment={handleAddComment}
+                  onAssignUser={handleAssignUser}
                 />
               ))}
             </div>

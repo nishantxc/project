@@ -1,6 +1,6 @@
 // components/TaskCard.tsx
 import { useState } from "react";
-import { Task } from "@/types/kanban";
+import { Task, User } from "@/types/kanban";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   Card,
@@ -20,13 +20,21 @@ import TaskDrawer from "./TaskDrawer";
 
 interface TaskCardProps {
   task: Task;
+  users: User[];
+  onAddComment: (taskId: string, comment: string) => void;
+  onAssignUser: (taskId: string, userId: string) => void;
 }
 
-export default function TaskCard({ task }: TaskCardProps) {
+export default function TaskCard({
+  task,
+  users,
+  onAddComment,
+  onAssignUser,
+}: TaskCardProps  & { users: User[] }) {
   const [isDragging, setIsDragging] = useState(false);
   const [dragStartTime, setDragStartTime] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  
+
   // Set up draggable with custom drag start/end handlers
   const { attributes, listeners, setNodeRef, transform } = useDraggable({
     id: task.id,
@@ -85,10 +93,10 @@ export default function TaskCard({ task }: TaskCardProps) {
 
   return (
     <>
-      <div 
-        ref={setNodeRef} 
-        style={style} 
-        {...attributes} 
+      <div
+        ref={setNodeRef}
+        style={style}
+        {...attributes}
         {...combinedListeners}
         onClick={handleCardClick}
       >
@@ -105,7 +113,7 @@ export default function TaskCard({ task }: TaskCardProps) {
             >
               {task.tag}
             </div>
-            <button 
+            <button
               className="text-gray-400 hover:text-gray-600"
               onClick={(e) => {
                 e.stopPropagation();
@@ -170,11 +178,14 @@ export default function TaskCard({ task }: TaskCardProps) {
         </Card>
       </div>
 
-      {/* Task Drawer */}
+      {/* Updated TaskDrawer */}
       <TaskDrawer
-        isOpen={isDrawerOpen} 
+        isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}
         task={task}
+        users={users}
+        onAddComment={onAddComment}
+        onAssignUser={onAssignUser}
       />
     </>
   );

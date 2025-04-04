@@ -64,3 +64,11 @@ export interface TaskDrawerProps {
   onClose: () => void;
   task: Task;
 }
+
+export interface BoardColumnProps {
+  column: Column & { tasks: Task[] };
+  tasks: Task[];
+  onAddTask: (task: Omit<Task, "id">) => void;
+  onAddComment: (taskId: string, comment: string) => void;
+  onAssignUser: (taskId: string, userId: string) => void;
+}
