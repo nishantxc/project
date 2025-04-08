@@ -1,16 +1,45 @@
 // components/LoginForm.tsx
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { EyeIcon, EyeOffIcon, Notebook } from 'lucide-react';
-import Image from 'next/image';
+import { useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { EyeIcon, EyeOffIcon, Notebook } from "lucide-react";
+import Image from "next/image";
+import { createSupabaseClient } from "@/lib/supabase";
+import Link from "next/link";
 
 export default function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const supabase = createSupabaseClient();
+  const [isLoading, setIsLoading] = useState(false);
+
+
+  const handleLogin = async () => {
+    setIsLoading(true);
+    try {
+      const { data, error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (error) {
+        alert(error.message);
+        return;
+      }
+
+      // Log the full response to verify the data structure
+      console.log("Auth response:", data);
+
+      // After successful login, redirect
+      window.location.href = "/";
+    } catch (error) {
+      console.error("Login error:", error);
+    }
+    setIsLoading(false);
+  };
 
   const togglePasswordVisibility = () => {
     setShowPassword(!showPassword);
@@ -18,8 +47,8 @@ export default function LoginForm() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle login logic here
-    console.log('Login with:', username, password);
+    handleLogin();
+    console.log("Login with:", email, password);
   };
 
   return (
@@ -27,7 +56,7 @@ export default function LoginForm() {
       {/* Logo */}
       <div className="flex items-center mb-12">
         <div className="w-10 h-10 bg-blue-600 rounded flex items-center justify-center">
-          <Notebook className='text-white' />
+          <Notebook className="text-white" />
         </div>
         <span className="ml-2 text-xl font-bold uppercase">sfs-Kanban</span>
       </div>
@@ -43,15 +72,15 @@ export default function LoginForm() {
         <div className="space-y-6">
           {/* Username field */}
           <div className="space-y-2">
-            <label htmlFor="username" className="block text-sm font-medium">
-              Username
+            <label htmlFor="email" className="block text-sm font-medium">
+              Email
             </label>
             <Input
-              id="username"
+              id="email"
               type="text"
-              placeholder="Enter your username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="h-12"
             />
           </div>
@@ -69,7 +98,7 @@ export default function LoginForm() {
             <div className="relative">
               <Input
                 id="password"
-                type={showPassword ? 'text' : 'password'}
+                type={showPassword ? "text" : "password"}
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -90,16 +119,19 @@ export default function LoginForm() {
           </div>
 
           {/* Login button */}
-          <Button type="submit" className="w-full h-12 bg-blue-500 hover:bg-blue-600">
-            Login
+          <Button
+            type="submit"
+            className="w-full h-12 bg-blue-500 hover:bg-blue-600"
+          >
+            {isLoading ? "Logging in..." : "Login"}
           </Button>
 
           {/* Sign up link */}
           <div className="text-center text-sm text-gray-600">
-            Don't have an account?{' '}
-            <a href="#" className="text-blue-600 hover:underline">
+            Don't have an account?{" "}
+            <Link href={"/register"} className="text-blue-600 hover:underline">
               Sign Up
-            </a>
+            </Link>
           </div>
         </div>
       </form>

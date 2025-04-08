@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Task, TaskModalProps, User } from "@/types/kanban";
 import {
@@ -37,6 +36,31 @@ import { Check, ChevronsUpDown } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
 
+const users = [
+  {
+    id: "1",
+    name: "Karen Smith",
+    role: "Designer",
+    online: true,
+    avatar: "/avatars/karen.png",
+  },
+  {
+    id: "2",
+    name: "Steve McConnell",
+    role: "Officer",
+    online: true,
+    avatar: "/avatars/steve.png",
+  },
+  {
+    id: "3",
+    name: "Sarah Green",
+    role: "Officer",
+    online: true,
+    avatar: "/avatars/sarah.png",
+  },
+];
+
+
 export default function TaskModal({
   isOpen,
   onClose,
@@ -45,46 +69,64 @@ export default function TaskModal({
   task,
   users,
 }: TaskModalProps & { users: User[] }) {
-  
   const defaultTask = {
     title: "",
     description: "",
     tag: "UX stages",
     tagType: "default",
-    column: columnId,
+    kanban_column: columnId,
     progress: "0/1",
-    assignees: [], 
+    assignees: [],
     comments: 0,
     attachments: 0,
     subtasks: 0,
   };
 
-  
   const [formValues, setFormValues] = useState<Omit<Task, "id">>({
     ...(task || defaultTask),
-    assignees: task?.assignees || [], 
-    column: task?.column || columnId,
+    assignees: task?.assignees || [],
+    kanban_column: task?.kanban_column || columnId,
   });
 
-  
   useEffect(() => {
     if (isOpen) {
       setFormValues({
         ...(task || defaultTask),
-        assignees: task?.assignees || [], 
-        column: task?.column || columnId,
+        assignees: task?.assignees || [],
+        kanban_column: task?.kanban_column || columnId,
       });
     }
   }, [isOpen, task, columnId]);
 
-  
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    onSave(formValues);
-    onClose();
+    console.log("clicked");
+    
+    
+    try {
+      const response = await fetch("/api/tasks", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formValues),
+      });
+      
+      console.log("clicked and got response");
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.message || "Failed to create task");
+      }
+
+      const { task } = await response.json();
+      onSave(task);
+      onClose();
+    } catch (error) {
+      console.error("Error creating task:", error);
+      alert("Failed to create task. Please try again.");
+    }
   };
 
-  
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
@@ -95,7 +137,6 @@ export default function TaskModal({
     }));
   };
 
-  
   const handleSelectChange = (name: string, value: string) => {
     setFormValues((prev) => ({
       ...prev,
@@ -194,7 +235,7 @@ export default function TaskModal({
             </div>
 
             <div className="grid gap-2 mt-4">
-              <Label htmlFor="assignees">Assignees</Label>
+              <Label htmlFor="assignees">Assign Task</Label>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button

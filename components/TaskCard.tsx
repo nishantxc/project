@@ -1,19 +1,8 @@
-
 import { useState } from "react";
 import { Task, User } from "@/types/kanban";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-} from "@/components/ui/card";
-import {
-  MoreVertical,
-  MessageSquare,
-  Paperclip,
-  CheckSquare,
-} from "lucide-react";
+import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { MoreVertical, MessageSquare, Paperclip, CheckSquare } from "lucide-react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import TaskDrawer from "./TaskDrawer";
@@ -25,48 +14,18 @@ interface TaskCardProps {
   onAssignUser: (taskId: string, userId: string) => void;
 }
 
-export default function TaskCard({
-  task,
-  users,
-  onAddComment,
-  onAssignUser,
-}: TaskCardProps  & { users: User[] }) {
-  const [isDragging, setIsDragging] = useState(false);
-  const [dragStartTime, setDragStartTime] = useState(0);
+export default function TaskCard({ task, users, onAddComment, onAssignUser }: TaskCardProps) {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
-  
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+  const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: task.id,
   });
 
-  
-  const handleDragStart = () => {
-    setIsDragging(true);
-    setDragStartTime(Date.now());
-  };
-
-  const handleDragEnd = () => {
-    setIsDragging(false);
-  };
-
-  
-  const handleCardClick = (e: React.MouseEvent) => {
-    
-    const dragDuration = Date.now() - dragStartTime;
-    if (!isDragging || dragDuration < 200) {
-      setIsDrawerOpen(true);
-      e.stopPropagation();
-    }
-  };
-
-  
   const style = {
     transform: CSS.Translate.toString(transform),
     opacity: isDragging ? 0.8 : 1,
   };
 
-  
   const getTagStyle = (tagType: string) => {
     switch (tagType) {
       case "purple":
@@ -78,57 +37,30 @@ export default function TaskCard({
     }
   };
 
-  
-  const combinedListeners = {
-    ...listeners,
-    onDragStart: (e: any) => {
-      handleDragStart();
-      if (listeners?.onDragStart) listeners?.onDragStart(e);
-    },
-    onDragEnd: (e: any) => {
-      handleDragEnd();
-      if (listeners?.onDragEnd) listeners?.onDragEnd(e);
-    },
-  };
-
   return (
     <>
       <div
         ref={setNodeRef}
         style={style}
         {...attributes}
-        {...combinedListeners}
-        onClick={handleCardClick}
+        {...listeners}
+        onClick={() => setIsDrawerOpen(true)}
       >
-        <Card
-          className={`bg-white border ${
-            isDragging ? "shadow-md" : "shadow-sm"
-          } cursor-grab`}
-        >
+        <Card className={`bg-white border ${isDragging ? "shadow-md" : "shadow-sm"} cursor-grab`}>
           <CardHeader className="p-3 pb-0 flex flex-row items-center justify-between">
-            <div
-              className={`text-xs px-2 py-1 rounded-md ${getTagStyle(
-                task.tagType
-              )}`}
-            >
+            <div className={`text-xs px-2 py-1 rounded-md ${getTagStyle(task.tagType)}`}>
               {task.tag}
             </div>
             <button
               className="text-gray-400 hover:text-gray-600"
-              onClick={(e) => {
-                e.stopPropagation();
-                
-              }}
+              onClick={(e) => e.stopPropagation()}
             >
               <MoreVertical className="w-4 h-4" />
             </button>
           </CardHeader>
           <CardContent className="p-3 pt-2">
             <h4 className="font-medium mb-1">{task.title}</h4>
-            <p className="text-gray-500 text-sm line-clamp-2">
-              {task.description}
-            </p>
-
+            <p className="text-gray-500 text-sm line-clamp-2">{task.description}</p>
             {task.progress && (
               <div className="mt-2 flex items-center space-x-2">
                 <svg
@@ -150,16 +82,12 @@ export default function TaskCard({
           </CardContent>
           <CardFooter className="p-3 pt-0 flex items-center justify-between">
             <div className="flex -space-x-2">
-              {task.assignees.map((assigneeId, i) => (
-                <Avatar
-                  key={assigneeId}
-                  className="border-2 border-white w-6 h-6"
-                >
+              {task.assignees.map((assigneeId) => (
+                <Avatar key={assigneeId} className="border-2 border-white w-6 h-6">
                   <AvatarFallback>{assigneeId.charAt(0)}</AvatarFallback>
                 </Avatar>
               ))}
             </div>
-
             <div className="flex items-center space-x-2 text-gray-400">
               <div className="flex items-center space-x-1">
                 <MessageSquare className="w-3 h-3" />
@@ -177,8 +105,6 @@ export default function TaskCard({
           </CardFooter>
         </Card>
       </div>
-
-      {/* Updated TaskDrawer */}
       <TaskDrawer
         isOpen={isDrawerOpen}
         onClose={() => setIsDrawerOpen(false)}

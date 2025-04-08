@@ -12,7 +12,7 @@ export interface Task {
   description: string;
   tag: string;
   tagType: string;
-  column: string;
+  kanban_column: string;
   progress: string;
   assignees: string[];
   comments: number;

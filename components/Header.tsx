@@ -1,10 +1,27 @@
 // components/Header.tsx
-import { Search, Settings, Bell } from 'lucide-react';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Search, Settings, Bell, LogOut } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { useState } from "react";
+import LogoutModal from "./LogoutModal";
 
-export default function Header() {
+type HeaderProps = {
+  user: any | null;
+};
+
+export default function Header({ user }: HeaderProps) {
+  const [toggleSignoutModal, setToggleSignoutModal] = useState(false);
+
+  const handleSettings = () => {
+    setToggleSignoutModal(true);
+  };
+
+  const handleCancel = () => {
+    setToggleSignoutModal(false);
+  };
+
   return (
-    <div className="h-16 border-b bg-white flex items-center justify-between px-6">
+    <div className="relative h-16 border-b bg-white flex items-center justify-between px-6">
+      {toggleSignoutModal && <LogoutModal onCancel={handleCancel} />}
       <div className="relative">
         <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
         <input
@@ -13,10 +30,13 @@ export default function Header() {
           className="pl-10 pr-4 py-2 rounded-md bg-gray-100 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500 w-64"
         />
       </div>
-      
+
       <div className="flex items-center space-x-4">
-        <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
-          <Settings className="w-4 h-4" />
+        <button
+          onClick={() => handleSettings()}
+          className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200"
+        >
+          <LogOut className="w-4 h-4" />
         </button>
         <div className="relative">
           <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
@@ -26,8 +46,8 @@ export default function Header() {
         </div>
         <div className="flex items-center space-x-2">
           <Avatar>
-            <AvatarImage src="/avatars/alison.png" alt="Alison Hopper" />
-            <AvatarFallback>AH</AvatarFallback>
+            <AvatarImage src="/avatars/alison.png" alt="User Avatar" />
+            <AvatarFallback>{user?.email?.charAt(0) || "U"}</AvatarFallback>
           </Avatar>
           {/* <span className="text-sm font-medium md:hidden">Alison Hopper</span> */}
         </div>

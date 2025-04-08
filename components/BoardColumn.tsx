@@ -1,13 +1,10 @@
-
 import { useState } from "react";
 import { BoardColumnProps, Column, Task, User } from "@/types/kanban";
 import { Button } from "@/components/ui/button";
 import { Plus, MoreVertical } from "lucide-react";
 import TaskCard from "./TaskCard";
 import TaskModal from "./TaskModal";
-import { useDroppable } from "@dnd-kit/core";
-
-
+import { DragOverlay, useDroppable } from "@dnd-kit/core";
 
 export default function BoardColumn({
   column,
@@ -19,12 +16,10 @@ export default function BoardColumn({
 }: BoardColumnProps & { users: User[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
   });
 
-  
   const getColumnColor = (columnId: string) => {
     switch (columnId) {
       case "todo":
@@ -42,7 +37,6 @@ export default function BoardColumn({
 
   return (
     <div className="w-full flex-shrink-0 flex flex-col h-full">
-      
       <div
         className={`flex items-center justify-between mb-3 p-2 rounded-lg ${getColumnColor(
           column.id
@@ -58,12 +52,11 @@ export default function BoardColumn({
           </span>
           <h3 className="font-medium truncate">{column.title}</h3>
         </div>
-        <button className="text-gray-500 hover:text-gray-700 flex-shrink-0">
+        {/* <button className="text-gray-500 hover:text-gray-700 flex-shrink-0">
           <MoreVertical className="w-4 h-4" />
-        </button>
+        </button> */}
       </div>
 
-      
       <Button
         variant="ghost"
         className="mb-3 justify-start text-gray-600 hover:text-blue-600 hover:bg-blue-50 border border-dashed border-gray-300 bg-white text-sm"
@@ -73,24 +66,22 @@ export default function BoardColumn({
         <span className="truncate">Add New Task</span>
       </Button>
 
-      
       <div
         ref={setNodeRef}
-        className={`space-y-3 overflow-y-auto flex-1 p-1 rounded-lg ${
+        className={`space-y-3 overflow-y-auto flex-1 p-1 rounded-lg -z-1 ${
           isOver ? "bg-blue-50" : ""
         }`}
       >
-        {tasks.map((task) => (
-          <TaskCard
-            onAddComment={onAddComment}
-            onAssignUser={onAssignUser}
-            key={task.id}
-            task={task}
-            users={users}
-          />
-        ))}
+          {tasks.map((task) => (
+            <TaskCard
+              onAddComment={onAddComment}
+              onAssignUser={onAssignUser}
+              key={task.id}
+              task={task}
+              users={users}
+            />
+          ))}
 
-        
         {tasks.length === 0 && (
           <div className="text-center p-3 text-gray-400 text-sm border border-dashed rounded-lg">
             No tasks in this column
@@ -98,7 +89,6 @@ export default function BoardColumn({
         )}
       </div>
 
-      
       <TaskModal
         isOpen={isModalOpen}
         onClose={() => setIsModalOpen(false)}

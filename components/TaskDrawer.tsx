@@ -366,7 +366,7 @@ export default function TaskDrawer({
         </Tabs>
 
         <SheetFooter className="mt-6 flex gap-2">
-          <Button variant="outline" className="flex-1">
+          <Button disabled={true} variant="outline" className="flex-1">
             <Edit className="h-4 w-4 mr-2" />
             Edit Task
           </Button>
