@@ -10,7 +10,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import {
   Select,
   SelectContent,
@@ -18,48 +17,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
-import { ScrollArea } from "./ui/scroll-area";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-} from "@/components/ui/command";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { Check, ChevronsUpDown } from "lucide-react";
-import { cn } from "@/lib/utils";
-import { X } from "lucide-react";
-
-const users = [
-  {
-    id: "1",
-    name: "Karen Smith",
-    role: "Designer",
-    online: true,
-    avatar: "/avatars/karen.png",
-  },
-  {
-    id: "2",
-    name: "Steve McConnell",
-    role: "Officer",
-    online: true,
-    avatar: "/avatars/steve.png",
-  },
-  {
-    id: "3",
-    name: "Sarah Green",
-    role: "Officer",
-    online: true,
-    avatar: "/avatars/sarah.png",
-  },
-];
-
+import ReactQuill from "react-quill";
+import "react-quill/dist/quill.snow.css"; // Import the default Quill stylesheet
 
 export default function TaskModal({
   isOpen,
@@ -102,7 +61,6 @@ export default function TaskModal({
     e.preventDefault();
     console.log("clicked");
     
-    
     try {
       const response = await fetch("/api/tasks", {
         method: "POST",
@@ -128,12 +86,19 @@ export default function TaskModal({
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement>
   ) => {
     const { name, value } = e.target;
     setFormValues((prev) => ({
       ...prev,
       [name]: value,
+    }));
+  };
+
+  const handleDescriptionChange = (value: string) => {
+    setFormValues((prev) => ({
+      ...prev,
+      description: value,
     }));
   };
 
@@ -144,9 +109,31 @@ export default function TaskModal({
     }));
   };
 
+  // Quill modules configuration
+  const quillModules = {
+    toolbar: [
+      [{ header: [1, 2, false] }],
+      ["bold", "italic", "underline"],
+      ["link"],
+      [{ list: "ordered" }, { list: "bullet" }],
+      ["clean"],
+    ],
+  };
+
+  // Quill formats configuration
+  const quillFormats = [
+    "header",
+    "bold",
+    "italic",
+    "underline",
+    "link",
+    "list",
+    "bullet",
+  ];
+
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="w-full">
         <form onSubmit={handleSubmit}>
           <DialogHeader>
             <DialogTitle>{task ? "Edit Task" : "Create New Task"}</DialogTitle>
@@ -165,19 +152,20 @@ export default function TaskModal({
               />
             </div>
 
-            <div className="grid gap-2">
+            <div className="grid gap-2 ">
               <Label htmlFor="description">Description</Label>
-              <Textarea
-                id="description"
-                name="description"
+              <ReactQuill
                 value={formValues.description}
-                onChange={handleChange}
+                onChange={handleDescriptionChange}
+                modules={quillModules}
+                formats={quillFormats}
                 placeholder="Task description"
                 className="min-h-24"
+                theme="snow"
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 z-10 mt-16 sm:mt-12">
               <div className="grid gap-2">
                 <Label htmlFor="tag">Tag</Label>
                 <Select
@@ -232,116 +220,6 @@ export default function TaskModal({
               <p className="text-xs text-gray-500">
                 Format: completed/total (e.g., 0/5)
               </p>
-            </div>
-
-            <div className="grid gap-2 mt-4">
-              <Label htmlFor="assignees">Assign Task</Label>
-              <Popover>
-                <PopoverTrigger asChild>
-                  <Button
-                    variant="outline"
-                    role="combobox"
-                    className="w-full justify-between"
-                  >
-                    {(formValues.assignees?.length || 0) > 0
-                      ? `${formValues.assignees?.length} user${
-                          (formValues.assignees?.length || 0) > 1 ? "s" : ""
-                        } selected`
-                      : "Select users"}
-                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-                  </Button>
-                </PopoverTrigger>
-                <PopoverContent className="w-full p-0">
-                  <Command>
-                    <CommandInput placeholder="Search users..." />
-                    <CommandEmpty>No users found.</CommandEmpty>
-                    <CommandGroup className="max-h-64 overflow-auto">
-                      {users.map((user) => (
-                        <CommandItem
-                          key={user.id}
-                          value={user.name}
-                          onSelect={() => {
-                            setFormValues((prev) => {
-                              const currentAssignees = prev.assignees || [];
-                              const newAssignees = currentAssignees.includes(
-                                user.id
-                              )
-                                ? currentAssignees.filter(
-                                    (id) => id !== user.id
-                                  )
-                                : [...currentAssignees, user.id];
-
-                              return {
-                                ...prev,
-                                assignees: newAssignees,
-                              };
-                            });
-                          }}
-                        >
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-6 w-6">
-                              <AvatarImage src={user.avatar} alt={user.name} />
-                              <AvatarFallback>
-                                {user.name.charAt(0)}
-                              </AvatarFallback>
-                            </Avatar>
-                            <div className="flex flex-col">
-                              <span>{user.name}</span>
-                              <span className="text-xs text-muted-foreground">
-                                {user.role}
-                              </span>
-                            </div>
-                          </div>
-                          <Check
-                            className={cn(
-                              "ml-auto h-4 w-4",
-                              (formValues.assignees || []).includes(user.id)
-                                ? "opacity-100"
-                                : "opacity-0"
-                            )}
-                          />
-                        </CommandItem>
-                      ))}
-                    </CommandGroup>
-                  </Command>
-                </PopoverContent>
-              </Popover>
-
-              {(formValues.assignees?.length || 0) > 0 && (
-                <div className="flex flex-wrap gap-1 mt-2">
-                  {(formValues.assignees || []).map((userId) => {
-                    const user = users.find((u) => u.id === userId);
-                    return (
-                      <div
-                        key={userId}
-                        className="flex items-center bg-gray-100 rounded-full px-2 py-1 text-xs"
-                      >
-                        <Avatar className="h-4 w-4 mr-1">
-                          <AvatarImage src={user?.avatar} alt={user?.name} />
-                          <AvatarFallback>
-                            {user?.name?.charAt(0) || userId.charAt(0)}
-                          </AvatarFallback>
-                        </Avatar>
-                        <span>{user?.name || `User ${userId}`}</span>
-                        <button
-                          type="button"
-                          className="ml-1 text-gray-500 hover:text-gray-700"
-                          onClick={() => {
-                            setFormValues((prev) => ({
-                              ...prev,
-                              assignees: (prev.assignees || []).filter(
-                                (id) => id !== userId
-                              ),
-                            }));
-                          }}
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    );
-                  })}
-                </div>
-              )}
             </div>
           </div>
 

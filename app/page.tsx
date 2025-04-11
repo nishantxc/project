@@ -105,21 +105,21 @@ export default function KanbanBoard() {
       name: "Karen Smith",
       role: "Designer",
       online: true,
-      avatar: "/avatars/karen.png",
+      avatar: "",
     },
     {
       id: "2",
       name: "Steve McConnell",
       role: "Officer",
       online: true,
-      avatar: "/avatars/steve.png",
+      avatar: "",
     },
     {
       id: "3",
       name: "Sarah Green",
       role: "Officer",
       online: true,
-      avatar: "/avatars/sarah.png",
+      avatar: "",
     },
   ]);
 
@@ -417,8 +417,8 @@ export default function KanbanBoard() {
           <div className="w-full flex flex-col md:flex-row md:items-center justify-between">
             <div>
               <h1 className="text-xl font-semibold">Sunfocus Solutions</h1>
-              <div className="h-1 w-32 bg-blue-500 mt-2 rounded-full"></div>
-              <span className="text-xs text-gray-500 mt-1">13% complete</span>
+              <div className="h-1 w-80 bg-blue-500 mt-2 rounded-full"></div>
+              <span className="text-xs text-gray-500 mt-1">55% complete</span>
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex -space-x-2">
@@ -432,7 +432,7 @@ export default function KanbanBoard() {
                   </Avatar>
                 ))}
                 <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border-2 border-white text-xs text-gray-500">
-                  +3
+                  +1
                 </div>
               </div>
               <Button
