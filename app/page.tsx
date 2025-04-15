@@ -25,13 +25,16 @@ import { v4 as uuidv4 } from "uuid";
 import { createSupabaseClient } from "@/lib/supabase";
 import AddMemberModal from "@/components/AddMemberModal";
 import TaskCard from "@/components/TaskCard";
+import { handleApiError } from "./api/errors";
+import { api } from "./api/api-collection";
 
 export default function KanbanBoard() {
   const [supabaseUser, setSupabaseUser] = useState<any>(null);
   const [toggleMemberModal, setToggleMemberModal] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   const handleDragStart = (event: DragStartEvent) => {
     const task = tasks.find((t) => t.id === event.active.id);
@@ -63,37 +66,24 @@ export default function KanbanBoard() {
     }
   };
 
-  const fetchTasks = async () => {
-    console.log("Fetching tasks...");
+  async function fetchTasks() {
     try {
-      const response = await fetch("/api/tasks", {
-        method: "GET",
-        headers: {
-          "Content-Type": "application/json",
-        },
-      });
-
-      console.log("Response status:", response.status);
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to fetch tasks");
-      }
-
-      const data = await response.json();
-      console.log("Tasks data:", data);
-
-      if (data.tasks) {
-        setTasks(data.tasks);
-      } else {
-        console.error("No tasks found in response:", data);
-        setTasks([]);
-      }
-    } catch (error) {
-      console.error("Error fetching tasks:", error);
-      // alert("Failed to fetch tasks. Please try again.");
+      setLoading(true);
+      const response = await api.tasks.getAll();
+      console.log(response, "---------");
+      
+      // setTasks(response.tasks);
+      setError(null);
+    } catch (err) {
+      setError(handleApiError(err, "Failed to load tasks"));
+    } finally {
+      setLoading(false);
     }
-  };
+  }
+
+  useEffect(() => {
+    fetchTasks();
+  }, []);
 
   useEffect(() => {
     fetchUser();
@@ -124,10 +114,10 @@ export default function KanbanBoard() {
   ]);
 
   const [columns, setColumns] = useState<Column[]>([
-    { id: "todo", title: "To Do", count: 3 },
-    { id: "progress", title: "In Progress", count: 2 },
-    { id: "review", title: "Need Review", count: 1 },
-    { id: "done", title: "Done", count: 2 },
+    { id: "todo", title: "To Do", count: 0 },
+    { id: "progress", title: "In Progress", count: 0 },
+    { id: "review", title: "Need Review", count: 0 },
+    { id: "done", title: "Done", count: 0 },
   ]);
 
   // const [tasks, setTasks] = useState<Task[]>([

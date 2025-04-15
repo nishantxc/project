@@ -9,8 +9,7 @@ export type SupabaseTokenData = {
 };
 
 /**
- * Extracts and decodes the Supabase access token from cookies
- * @returns The decoded access token or null if not found/invalid
+ * Extracts and decodes the Supabase access token from cookies (server-side)
  */
 export function getSupabaseToken(): string | null {
   try {
@@ -25,6 +24,9 @@ export function getSupabaseToken(): string | null {
     const base64String = tokenCookie.substring(7); // Remove "base64-" prefix
     const jsonString = Buffer.from(base64String, "base64").toString("utf-8");
     const session = JSON.parse(jsonString) as SupabaseTokenData;
+
+    console.log(session.access_token, "hii");
+    
     
     return session.access_token || null;
   } catch (error) {
@@ -55,4 +57,30 @@ export function createAuthenticatedSupabaseClient(accessToken: string) {
       },
     }
   );
+}
+
+// Client-side helper to get token from cookie
+export function getClientSideToken(): string | null {
+  try {
+    // Only run in browser
+    if (typeof window === 'undefined') return null;
+    
+    const tokenCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('sb-hlincslokiqoudwrvwle-auth-token='));
+    
+    if (!tokenCookie) return null;
+    
+    const cookieValue = tokenCookie.split('=')[1];
+    if (!cookieValue || !cookieValue.startsWith('base64-')) return null;
+    
+    const base64String = cookieValue.substring(7);
+    const jsonString = atob(base64String);
+    const session = JSON.parse(jsonString);
+    
+    return session.access_token || null;
+  } catch (error) {
+    console.error("Error extracting client token:", error);
+    return null;
+  }
 }

@@ -60,7 +60,7 @@ export default function TaskCard({ task, users, onAddComment, onAssignUser }: Ta
           </CardHeader>
           <CardContent className="p-3 pt-2">
             <h4 className="font-medium mb-1">{task.title}</h4>
-            <p className="text-gray-500 text-sm line-clamp-2">{task.description}</p>
+            <p className="text-gray-500 text-sm line-clamp-2">{task.description.toString()}</p>
             {task.progress && (
               <div className="mt-2 flex items-center space-x-2">
                 <svg

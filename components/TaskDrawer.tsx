@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Task, User } from "@/types/kanban";
 import {
@@ -40,6 +39,7 @@ import {
   CommandItem,
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { api } from "@/app/api/api-collection";
 
 interface TaskDrawerProps {
   isOpen: boolean;
@@ -87,6 +87,17 @@ export default function TaskDrawer({
     onAssignUser(taskId, userId);
   };
 
+  const handleDeleteTask = () => {
+    // Implement the logic to delete the task
+    try {
+      const response = api.tasks.delete(task.id);
+      console.log("Delete response:", response);
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+    onClose();
+  };
+
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
       <SheetContent className="w-full sm:max-w-md overflow-y-auto">
@@ -124,7 +135,6 @@ export default function TaskDrawer({
           </TabsList>
 
           <TabsContent value="details" className="mt-4 space-y-4">
-            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700">Progress</div>
               <div className="w-full bg-gray-200 rounded-full h-2">
@@ -142,7 +152,6 @@ export default function TaskDrawer({
               <div className="text-xs text-gray-500">{task.progress}</div>
             </div>
 
-            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700 flex justify-between">
                 <span>Assignees</span>
@@ -224,7 +233,6 @@ export default function TaskDrawer({
               </div>
             </div>
 
-            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700">Timeline</div>
               <div className="flex items-center text-xs text-gray-600">
@@ -237,7 +245,6 @@ export default function TaskDrawer({
               </div>
             </div>
 
-            
             <div className="space-y-2">
               <div className="text-sm font-medium text-gray-700 flex justify-between">
                 <span>Attachments ({task.attachments})</span>
@@ -265,7 +272,6 @@ export default function TaskDrawer({
           </TabsContent>
 
           <TabsContent value="comments" className="mt-4 space-y-4">
-            
             {task.comments > 0 ? (
               <div className="space-y-4">
                 {[...Array(task.comments)].map((_, i) => {
@@ -301,7 +307,6 @@ export default function TaskDrawer({
               <div className="text-sm text-gray-500">No comments yet</div>
             )}
 
-            
             <div className="mt-4 space-y-2">
               <Textarea
                 placeholder="Add a comment..."
@@ -322,7 +327,6 @@ export default function TaskDrawer({
           </TabsContent>
 
           <TabsContent value="subtasks" className="mt-4 space-y-4">
-            
             {task.subtasks > 0 ? (
               <div className="space-y-2">
                 {[...Array(task.subtasks)].map((_, i) => (
@@ -357,7 +361,6 @@ export default function TaskDrawer({
               <div className="text-sm text-gray-500">No subtasks yet</div>
             )}
 
-            
             <Button variant="outline" size="sm" className="w-full">
               <Plus className="h-3 w-3 mr-1" />
               <span>Add Subtask</span>

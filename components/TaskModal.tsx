@@ -19,6 +19,8 @@ import {
 } from "@/components/ui/select";
 import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; // Import the default Quill stylesheet
+import { api } from "@/app/api/api-collection";
+import { handleApiError } from "@/app/api/errors";
 
 export default function TaskModal({
   isOpen,
@@ -59,29 +61,33 @@ export default function TaskModal({
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("clicked");
+    
+    // Prepare task data
+    const taskData = {
+      title: formValues.title,
+      description: formValues.description,
+      tag: formValues.tag,
+      tagType: formValues.tagType,
+      kanban_column: formValues.kanban_column,
+      progress: formValues.progress,
+      assignees: formValues.assignees,
+      comments: 0,
+      attachments: 0,
+      subtasks: 0,
+    };
     
     try {
-      const response = await fetch("/api/tasks", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formValues),
-      });
+      console.log('Submitting task:', taskData);
+      const response = await api.tasks.create(taskData);
+      console.log('Create response:', response);
       
-      console.log("clicked and got response");
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to create task");
+      if (response.task) {
+        onSave?.(response.task);
+        onClose();
       }
-
-      const { task } = await response.json();
-      onSave(task);
-      onClose();
-    } catch (error) {
-      console.error("Error creating task:", error);
-      alert("Failed to create task. Please try again.");
+    } catch (err) {
+      console.error('Create task error:', err);
+      handleApiError(err, 'Failed to create task');
     }
   };
 
