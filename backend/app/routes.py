@@ -2,6 +2,7 @@
 import os
 from datetime import datetime
 from flask import Blueprint, request, jsonify
+from flask_cors import cross_origin
 from supabase import create_client, Client
 from app.auth import auth_required, get_authenticated_client
 
@@ -21,10 +22,9 @@ def get_tasks():
         # Add debug logging for the user context
         print(f"Fetching tasks for user: {user_id}")
         
-        # Verify client connection
-        client = get_authenticated_client(request.headers.get('Authorization').split(" ")[1])
-        if not client:
-            return jsonify({"error": "Client authentication failed"}), 401
+        # Get authenticated client
+        token = request.headers.get('Authorization').split(" ")[1]
+        client = get_authenticated_client(token)
         
         # Execute query with error handling
         response = client.table('tasks').select('*').eq('user_id', user_id).execute()
@@ -107,3 +107,71 @@ def update_task():
     except Exception as e:
         print(f"Task update error: {str(e)}")
         return jsonify({"error": "Invalid request body", "details": str(e)}), 400
+
+
+@api.route('/members', methods=['GET'])
+@auth_required
+def get_members():
+    """Get all members for the authenticated user"""
+    user_id = request.user.id
+
+    try:
+        # Add debug logging for the user context
+        print(f"Fetching members for user: {user_id}")
+
+        # Verify client connection
+        client = get_authenticated_client(request.headers.get('Authorization').split(" ")[1])
+        if not client:
+            return jsonify({"error": "Client authentication failed"}), 401
+        # Execute query with error handling
+        response = client.table('members').select('*').eq('user_id', user_id).execute()
+        if not response.data:
+            return jsonify({"error": "No members found"}), 404
+        return jsonify({"members": response.data})
+    except Exception as e:
+        print(f"Member fetch error: {str(e)}")
+        return jsonify({"error": "Internal server error"}), 500
+
+
+@api.route('/members', methods=['POST'])
+@auth_required
+@cross_origin(origins=["http://localhost:3000"], supports_credentials=True, methods=["POST"], allow_headers=["Content-Type", "Authorization"])
+def create_member():
+    """Create a new member for the authenticated user"""
+    token = request.headers.get('Authorization').split(" ")[1]
+    user_id = request.user.id
+    client = get_authenticated_client(token)
+
+    try:
+        member_data = request.get_json()
+        if not member_data:
+            return jsonify({"error": "Request body must be JSON"}), 400
+            
+        print(f"Member data received: {member_data}")
+        
+        # Validate required fields
+        if not member_data.get('name') or not member_data.get('role'):
+            return jsonify({"error": "Name and role are required"}), 400
+            
+        # Prepare member data
+        member_with_user = {
+            **member_data,
+            'user_id': user_id,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        # Insert member
+        response = client.table('members').insert(member_with_user).execute()
+        
+        if len(response.data) > 0:
+            member = response.data[0]
+            return jsonify({"member": member}), 201
+        else:
+            return jsonify({"error": "Failed to create member"}), 400
+            
+    except Exception as e:
+        print(f"Member creation error: {str(e)}")
+        return jsonify({
+            "error": "Invalid request body", 
+            "details": str(e)
+        }), 400

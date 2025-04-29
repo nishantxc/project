@@ -44,7 +44,7 @@ def auth_required(f):
     @wraps(f)
     def decorated(*args, **kwargs):
         auth_header = request.headers.get('Authorization')
-        print(token, "====token====")
+        print(auth_header, "====auth_header====")
         
         if not auth_header or not auth_header.startswith('Bearer '):
             return jsonify({"error": "Unauthorized"}), 401

@@ -16,12 +16,7 @@ export const apiMethods = {
       };
   
       if (token) {
-        console.log(token, "=======><=====");
-        
         headers['Authorization'] = `Bearer ${token}`;
-        // Add Supabase-specific headers
-        headers['apikey'] = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
-        headers['Authorization'] = `Bearer ${process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!}`;
       }
   
       const response = await fetch(url, {
@@ -65,6 +60,7 @@ export const apiMethods = {
         headers,
         body: JSON.stringify(data),
         credentials: 'include', // Important for cookies
+        mode: 'cors',
       });
   
       if (!response.ok) {

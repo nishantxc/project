@@ -68,7 +68,7 @@ export default function BoardColumn({
 
       <div
         ref={setNodeRef}
-        className={`space-y-3 overflow-y-auto flex-1 p-1 rounded-lg -z-1 ${
+        className={`space-y-3 overflow-y-scroll h-[5vh] flex-1 p-1 rounded-lg -z-1 ${
           isOver ? "bg-blue-50" : ""
         }`}
       >

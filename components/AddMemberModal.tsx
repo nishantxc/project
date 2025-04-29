@@ -2,37 +2,54 @@ import React, { useState } from "react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "./ui/select";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "./ui/select";
 import { createSupabaseClient } from "@/lib/supabase";
 import { motion } from "framer-motion";
-import { v4 as uuidv4 } from "uuid";
+import { api } from "@/app/api/api-collection";
 
 type MemberModalProps = {
   onCancel: () => void;
-//   onAddMember: (member: any) => void;
 };
 
 const AddMemberModal: React.FC<MemberModalProps> = ({ onCancel }) => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
   const [avatarUrl, setAvatarUrl] = useState("/avatars/default.png");
-  const supabase = createSupabaseClient();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+    setIsSubmitting(true);
+    setError(null);
+
     // Create new member object
     const newMember = {
-      id: uuidv4(),
-      name,
-      role,
-      online: true,
+      name: name,
+      role: role,
       avatar: avatarUrl,
+      online: true // Add online status
     };
-    
-    // Pass the new member to parent component
-    // onAddMember(newMember);
-    onCancel();
+
+    console.log("Submitting member:", newMember);
+
+    try {
+      // Use the API collection instead of direct fetch
+      const response = await api.members.create(newMember);
+      console.log("Member added successfully:", response);
+      onCancel();
+    } catch (error) {
+      console.error("Error adding member:", error);
+      setError("Failed to add member. Please try again.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -47,19 +64,19 @@ const AddMemberModal: React.FC<MemberModalProps> = ({ onCancel }) => {
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Add New Team Member
         </h2>
-        
+
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="name">Full Name</Label>
-            <Input 
-              id="name" 
+            <Input
+              id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               placeholder="Enter team member's name"
               required
             />
           </div>
-          
+
           <div className="space-y-2">
             <Label htmlFor="role">Role</Label>
             <Select value={role} onValueChange={setRole} required>
@@ -75,39 +92,27 @@ const AddMemberModal: React.FC<MemberModalProps> = ({ onCancel }) => {
               </SelectContent>
             </Select>
           </div>
-          
-          {/* <div className="space-y-2">
-            <Label htmlFor="avatar">Profile Picture</Label>
-            <div className="flex items-center space-x-4">
-              <div className="w-12 h-12 rounded-full bg-gray-200 overflow-hidden">
-                <img 
-                  src={avatarUrl} 
-                  alt="Avatar preview" 
-                  className="w-full h-full object-cover"
-                />
-              </div>
-              {/* <Select value={avatarUrl} onValueChange={setAvatarUrl}>
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Choose avatar" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="/avatars/karen.png">Karen</SelectItem>
-                  <SelectItem value="/avatars/steve.png">Steve</SelectItem>
-                  <SelectItem value="/avatars/sarah.png">Sarah</SelectItem>
-                  <SelectItem value="/avatars/brad.png">Brad</SelectItem>
-                  <SelectItem value="/avatars/alice.png">Alice</SelectItem>
-                  <SelectItem value="/avatars/default.png">Default</SelectItem>
-                </SelectContent>
-              </Select> */}
-            {/* </div> */}
-          {/* </div> */}
-          
+
+          {error && (
+            <div className="bg-red-50 text-red-700 p-2 rounded text-sm">
+              {error}
+            </div>
+          )}
+
           <div className="flex justify-end space-x-3 pt-4">
-            <Button type="button" variant="outline" onClick={onCancel}>
+            <Button 
+              type="button" 
+              variant="outline" 
+              onClick={onCancel}
+              disabled={isSubmitting}
+            >
               Cancel
             </Button>
-            <Button type="submit">
-              Add Member
+            <Button 
+              type="submit"
+              disabled={isSubmitting}
+            >
+              {isSubmitting ? "Adding..." : "Add Member"}
             </Button>
           </div>
         </form>

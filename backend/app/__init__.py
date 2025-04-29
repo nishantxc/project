@@ -9,8 +9,15 @@ load_dotenv()
 def create_app():
     app = Flask(__name__)
     
-    # Enable CORS
-    CORS(app, resources={r"/api/*": {"origins": "*"}})
+    # Enable CORS with proper configuration
+    CORS(app, resources={
+        r"/api/*": {
+            "origins": ["http://localhost:3000"],  # Update with your frontend origin
+            "allow_headers": ["Authorization", "Content-Type"],
+            "methods": ["GET", "POST", "PUT", "DELETE"],
+            "supports_credentials": True
+        }
+    })
     
     # Import and register blueprints
     from app.routes import api

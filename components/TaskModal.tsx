@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; // Import the default Quill stylesheet
+import "react-quill/dist/quill.snow.css"; 
 import { api } from "@/app/api/api-collection";
 import { handleApiError } from "@/app/api/errors";
 

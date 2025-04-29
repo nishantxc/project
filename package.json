@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev:frontend": "next dev",
-    "dev:backend": "cd backend && python wsgi.py",
+    "dev:backend": "source backend/venv/bin/activate && cd backend && python wsgi.py",
     "dev": "next dev",
     "build": "next build",
     "start": "next start",

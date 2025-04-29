@@ -32,6 +32,7 @@ export default function KanbanBoard() {
   const [supabaseUser, setSupabaseUser] = useState<any>(null);
   const [toggleMemberModal, setToggleMemberModal] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
+  
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -71,8 +72,8 @@ export default function KanbanBoard() {
       setLoading(true);
       const response = await api.tasks.getAll();
       console.log(response, "---------");
-      
-      // setTasks(response.tasks);
+
+      setTasks(response.tasks);
       setError(null);
     } catch (err) {
       setError(handleApiError(err, "Failed to load tasks"));
@@ -119,121 +120,6 @@ export default function KanbanBoard() {
     { id: "review", title: "Need Review", count: 0 },
     { id: "done", title: "Done", count: 0 },
   ]);
-
-  // const [tasks, setTasks] = useState<Task[]>([
-  //   {
-  //     id: "1",
-  //     title: "Wireframing",
-  //     description:
-  //       "Create a detailed wireframe that outlines the basic structure and layout of the product or service.",
-  //     tag: "UX stages",
-  //     tagType: "default",
-  //     column: "todo",
-  //     progress: "0/8",
-  //     assignees: ["1", "2", "4"],
-  //     comments: 2,
-  //     attachments: 0,
-  //     subtasks: 0,
-  //   },
-  //   {
-  //     id: "2",
-  //     title: "First design concept",
-  //     description:
-  //       "Create a concept based on the research and wireframes, exploring different visionary ideas of the project.",
-  //     tag: "Design",
-  //     tagType: "purple",
-  //     column: "todo",
-  //     progress: "0/4",
-  //     assignees: ["1", "2", "3"],
-  //     comments: 1,
-  //     attachments: 0,
-  //     subtasks: 3,
-  //   },
-  //   {
-  //     id: "3",
-  //     title: "Design library",
-  //     description:
-  //       "Create a collection of reusable design elements, such as buttons, forms, and navigation menus.",
-  //     tag: "Design",
-  //     tagType: "purple",
-  //     column: "todo",
-  //     progress: "1/9",
-  //     assignees: [],
-  //     comments: 0,
-  //     attachments: 0,
-  //     subtasks: 0,
-  //   },
-  //   {
-  //     id: "4",
-  //     title: "Customer Journey Mapping",
-  //     description:
-  //       "Identify key touchpoints between users and the customer journey, and to develop strategies to improve the overall customer.",
-  //     tag: "UX stages",
-  //     tagType: "default",
-  //     column: "progress",
-  //     progress: "3/10",
-  //     assignees: ["1", "2", "4"],
-  //     comments: 5,
-  //     attachments: 1,
-  //     subtasks: 7,
-  //   },
-  //   {
-  //     id: "5",
-  //     title: "Persona development",
-  //     description:
-  //       "Create detailed personas based on the research data to represent different user types, their characteristics, goals, and behaviors.",
-  //     tag: "UX stage",
-  //     tagType: "default",
-  //     column: "progress",
-  //     progress: "1/3",
-  //     assignees: ["1", "2"],
-  //     comments: 7,
-  //     attachments: 4,
-  //     subtasks: 3,
-  //   },
-  //   {
-  //     id: "6",
-  //     title: "Competitor research",
-  //     description:
-  //       "Identify the key competitors, analyze their good and bad points each of them. Comparing their product features, quality.",
-  //     tag: "UX stages",
-  //     tagType: "default",
-  //     column: "review",
-  //     progress: "7/7",
-  //     assignees: ["1", "2", "3", "4"],
-  //     comments: 4,
-  //     attachments: 3,
-  //     subtasks: 5,
-  //   },
-  //   {
-  //     id: "7",
-  //     title: "Branding: visual identity",
-  //     description:
-  //       "Create a comprehensive brand identity with logo, typography, color palette, and brand guidelines.",
-  //     tag: "Branding",
-  //     tagType: "red",
-  //     column: "done",
-  //     progress: "3/3",
-  //     assignees: ["1", "2", "4"],
-  //     comments: 3,
-  //     attachments: 6,
-  //     subtasks: 8,
-  //   },
-  //   {
-  //     id: "8",
-  //     title: "Marketing materials",
-  //     description:
-  //       "Create branded materials such as business cards, letterhead, brochures, product graphics.",
-  //     tag: "Branding",
-  //     tagType: "red",
-  //     column: "done",
-  //     progress: "5/5",
-  //     assignees: ["1", "2"],
-  //     comments: 7,
-  //     attachments: 7,
-  //     subtasks: 8,
-  //   },
-  // ]);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -317,7 +203,23 @@ export default function KanbanBoard() {
     //   // Optional: Revert UI update if needed
     //   setTasks(tasks);
     //   setColumns(columns);
-    // }
+    try {
+      console.log("Submitting task:", taskId, targetColumnId);
+
+      const response = await api.tasks.update(taskId, {
+        kanban_column: targetColumnId,
+      });
+      console.log("Create response:", response);
+
+      if (response.task) {
+        // onSave?.(response.task);
+        // onClose();
+        console.log("done jii");
+      }
+    } catch (err) {
+      console.error("Create task error:", err);
+      handleApiError(err, "Failed to create task");
+    }
   };
 
   const handleAddTask = (newTask: Omit<Task, "id">) => {
@@ -492,7 +394,7 @@ export default function KanbanBoard() {
         </div>
 
         {/* Board Content */}
-        <div className="flex-1 overflow-auto p-6 bg-gray-50">
+        <div className="flex-1 p-6 bg-gray-50">
           <DndContext
             sensors={sensors}
             onDragStart={handleDragStart}
