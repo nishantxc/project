@@ -40,12 +40,13 @@ import {
 } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import { api } from "@/app/api/api-collection";
+import { Member } from "@/types/apiTypes";
 
 interface TaskDrawerProps {
   isOpen: boolean;
   onClose: () => void;
   task: Task;
-  users: User[];
+  users: Member[];
   onAddComment: (taskId: string, comment: string) => void;
   onAssignUser: (taskId: string, userId: string) => void;
 }
@@ -57,7 +58,7 @@ export default function TaskDrawer({
   users,
   onAddComment,
   onAssignUser,
-}: TaskDrawerProps & { users: User[] }) {
+}: TaskDrawerProps & { users: Member[] }) {
   const [activeTab, setActiveTab] = useState("details");
   const [commentText, setCommentText] = useState("");
 
@@ -167,7 +168,7 @@ export default function TaskDrawer({
                       <CommandInput placeholder="Search users..." />
                       <CommandEmpty>No users found.</CommandEmpty>
                       <CommandGroup className="max-h-64 overflow-auto">
-                        {users.map((user) => (
+                        {users.map((user) => (     
                           <CommandItem
                             key={user.id}
                             value={user.name}
@@ -175,10 +176,6 @@ export default function TaskDrawer({
                           >
                             <div className="flex items-center gap-2 mr-2">
                               <Avatar className="h-5 w-5">
-                                <AvatarImage
-                                  src={user.avatar}
-                                  alt={user.name}
-                                />
                                 <AvatarFallback>
                                   {user.name.charAt(0)}
                                 </AvatarFallback>
@@ -210,7 +207,6 @@ export default function TaskDrawer({
                         className="flex items-center bg-gray-100 rounded-full px-2 py-1"
                       >
                         <Avatar className="h-5 w-5 mr-1">
-                          <AvatarImage src={user?.avatar} />
                           <AvatarFallback>
                             {user?.name.charAt(0) || assigneeId.charAt(0)}
                           </AvatarFallback>
@@ -282,7 +278,6 @@ export default function TaskDrawer({
                     <div key={i} className="bg-gray-50 p-3 rounded-lg">
                       <div className="flex items-center mb-2">
                         <Avatar className="h-6 w-6 mr-2">
-                          <AvatarImage src={user?.avatar} />
                           <AvatarFallback>
                             {user?.name.charAt(0) || "U"}
                           </AvatarFallback>

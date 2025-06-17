@@ -5,6 +5,7 @@ import { Plus, MoreVertical } from "lucide-react";
 import TaskCard from "./TaskCard";
 import TaskModal from "./TaskModal";
 import { DragOverlay, useDroppable } from "@dnd-kit/core";
+import { Member } from "@/types/apiTypes";
 
 export default function BoardColumn({
   column,
@@ -13,7 +14,7 @@ export default function BoardColumn({
   users,
   onAddComment,
   onAssignUser,
-}: BoardColumnProps & { users: User[] }) {
+}: BoardColumnProps & { users: Member[] }) {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const { setNodeRef, isOver } = useDroppable({

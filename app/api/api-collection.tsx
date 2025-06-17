@@ -34,13 +34,7 @@ const getAuthToken = async () => {
   return null;
 };
 
-/**
- * API Collection - Centralized place for all API endpoints
- */
 export const api = {
-  /**
-   * Task-related API endpoints
-   */
   tasks: {
     /**
      * Get all tasks for the authenticated user
@@ -95,24 +89,13 @@ export const api = {
       );
     },
   },
-
-  /**
-   * Member-related API endpoints
-   */
   members: {
-    /**
-     * Get all team members
-     */
     getAll: async (): Promise<MembersResponse> => {
       const token = await getAuthToken();
       if (!token) throw new Error("Authentication required");
 
       return apiMethods.get<MembersResponse>(`${API_BASE_URL}/api/members`, token);
     },
-
-    /**
-     * Create a new member
-     */
     create: async (memberData: Omit<Member, "id">): Promise<MemberResponse> => {
       const token = await getAuthToken();
       if (!token) throw new Error("Authentication required");
@@ -123,10 +106,6 @@ export const api = {
         token
       );
     },
-
-    /**
-     * Delete a member
-     */
     delete: async (
       memberId: string
     ): Promise<{ success: boolean; message: string }> => {

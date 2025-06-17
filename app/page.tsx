@@ -2,37 +2,38 @@
 
 export const dynamic = "force-dynamic";
 
-import { useState, useEffect } from "react";
-import {
-  DndContext,
-  DragEndEvent,
-  PointerSensor,
-  useSensors,
-  useSensor,
-  closestCorners,
-  DragOverlay,
-  DragStartEvent,
-} from "@dnd-kit/core";
-import { Card } from "@/components/ui/card";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { User, Task, Column } from "@/types/kanban";
-import Sidebar from "@/components/Sidebar";
+import AddMemberModal from "@/components/AddMemberModal";
 import BoardColumn from "@/components/BoardColumn";
 import Header from "@/components/Header";
-import { v4 as uuidv4 } from "uuid";
-import { createSupabaseClient } from "@/lib/supabase";
-import AddMemberModal from "@/components/AddMemberModal";
 import TaskCard from "@/components/TaskCard";
-import { handleApiError } from "./api/errors";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { createSupabaseClient } from "@/lib/supabase";
+import { Member } from "@/types/apiTypes";
+import { Column, Task, User } from "@/types/kanban";
+import {
+  closestCorners,
+  DndContext,
+  DragEndEvent,
+  DragOverlay,
+  DragStartEvent,
+  PointerSensor,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import { useEffect, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import { api } from "./api/api-collection";
+import { handleApiError } from "./api/errors";
 
 export default function KanbanBoard() {
   const [supabaseUser, setSupabaseUser] = useState<any>(null);
   const [toggleMemberModal, setToggleMemberModal] = useState(false);
   const [tasks, setTasks] = useState<Task[]>([]);
-  
+  const [members, setMembers] = useState<Member[]>([]);
+  const [toggleMember, setToggleMembers] = useState(false);
+
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -67,12 +68,22 @@ export default function KanbanBoard() {
     }
   };
 
+  async function fetchMembers() {
+    try {
+      setLoading(true);
+      const res = await api.members.getAll();
+      console.log(res, "members log");
+      setMembers(res.members);
+    } catch (error) {
+      console.log(error);
+      setError(handleApiError(error, "Failed to load members"));
+    }
+  }
+
   async function fetchTasks() {
     try {
       setLoading(true);
       const response = await api.tasks.getAll();
-      console.log(response, "---------");
-
       setTasks(response.tasks);
       setError(null);
     } catch (err) {
@@ -84,13 +95,11 @@ export default function KanbanBoard() {
 
   useEffect(() => {
     fetchTasks();
-  }, []);
-
-  useEffect(() => {
+    fetchMembers();
     fetchUser();
   }, []);
 
-  const [users] = useState<User[]>([
+  const [users] = useState<Member[]>([
     {
       id: "1",
       name: "Karen Smith",
@@ -288,10 +297,6 @@ export default function KanbanBoard() {
     setToggleMemberModal(true);
   };
 
-  //  const onAddMember = () => {
-  //   users.push
-  //  }
-
   return (
     <div className="flex h-screen overflow-hidden">
       {/* Sidebar */}
@@ -314,18 +319,26 @@ export default function KanbanBoard() {
             </div>
             <div className="flex items-center space-x-4">
               <div className="flex -space-x-2">
-                {users.slice(0, 4).map((user) => (
+                {members.slice(0, 4).map((user) => (
+                  <div className="relative">
                   <Avatar
                     key={user.id}
                     className="border-2 border-white w-8 h-8"
                   >
-                    <AvatarImage src={user.avatar} alt={user.name} />
-                    <AvatarFallback>{user.name.charAt(0)}</AvatarFallback>
+                    {/* <AvatarImage src={user.avatar} alt={user.name} /> */}
+                    <AvatarFallback>{user.name.charAt(0).toUpperCase()}</AvatarFallback>
                   </Avatar>
+                  <div className="absolute botton-0 right-0 w-fit bg-blue-100 rounded-lg flex flex-col gap-1 p-2 items-start justify-center">
+                      <p className="font-semibold text-sm text-gray-700">Name: <span className="font-light text-sm text-black">{user?.name}</span></p>
+                      <p className="font-semibold text-sm text-gray-700">Role: <span className="font-light text-sm text-black">{user?.role}</span></p>
+                  </div>
+                  </div>
                 ))}
-                <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border-2 border-white text-xs text-gray-500">
-                  +1
-                </div>
+                {members.length > 3 && (
+                  <div className="flex items-center justify-center w-8 h-8 rounded-full bg-gray-100 border-2 border-white text-xs text-gray-500">
+                    +1
+                  </div>)
+                }
               </div>
               <Button
                 variant="outline"
@@ -407,7 +420,7 @@ export default function KanbanBoard() {
                   key={column.id}
                   column={column}
                   tasks={column.tasks}
-                  users={users}
+                  users={members}
                   onAddTask={handleAddTask}
                   onAddComment={handleAddComment}
                   onAssignUser={handleAssignUser}
@@ -418,7 +431,7 @@ export default function KanbanBoard() {
               {activeTask ? (
                 <TaskCard
                   task={activeTask}
-                  users={users}
+                  users={members}
                   onAddComment={handleAddComment}
                   onAssignUser={handleAssignUser}
                 />

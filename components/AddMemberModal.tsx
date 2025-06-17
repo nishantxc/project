@@ -20,7 +20,6 @@ type MemberModalProps = {
 const AddMemberModal: React.FC<MemberModalProps> = ({ onCancel }) => {
   const [name, setName] = useState("");
   const [role, setRole] = useState("");
-  const [avatarUrl, setAvatarUrl] = useState("/avatars/default.png");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -33,8 +32,6 @@ const AddMemberModal: React.FC<MemberModalProps> = ({ onCancel }) => {
     const newMember = {
       name: name,
       role: role,
-      avatar: avatarUrl,
-      online: true // Add online status
     };
 
     console.log("Submitting member:", newMember);

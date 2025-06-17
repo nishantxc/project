@@ -6,10 +6,11 @@ import { MoreVertical, MessageSquare, Paperclip, CheckSquare } from "lucide-reac
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
 import TaskDrawer from "./TaskDrawer";
+import { Member } from "@/types/apiTypes";
 
 interface TaskCardProps {
   task: Task;
-  users: User[];
+  users: Member[];
   onAddComment: (taskId: string, comment: string) => void;
   onAssignUser: (taskId: string, userId: string) => void;
 }

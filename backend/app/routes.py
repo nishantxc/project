@@ -167,6 +167,7 @@ def create_member():
             member = response.data[0]
             return jsonify({"member": member}), 201
         else:
+            print(f"Failed to create member: {response}")
             return jsonify({"error": "Failed to create member"}), 400
             
     except Exception as e:

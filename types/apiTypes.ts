@@ -22,10 +22,8 @@ export interface TasksResponse {
 }
 
 export interface Member {
-  id?: string;
+  id: string;
   name: string;
-  online?: boolean;
-  avatar?: string;
   user_id?: string;
   created_at?: string;
   role: string;

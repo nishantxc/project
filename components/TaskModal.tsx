@@ -21,6 +21,7 @@ import ReactQuill from "react-quill";
 import "react-quill/dist/quill.snow.css"; 
 import { api } from "@/app/api/api-collection";
 import { handleApiError } from "@/app/api/errors";
+import { Member } from "@/types/apiTypes";
 
 export default function TaskModal({
   isOpen,
@@ -29,7 +30,7 @@ export default function TaskModal({
   columnId,
   task,
   users,
-}: TaskModalProps & { users: User[] }) {
+}: TaskModalProps & { users: Member[] }) {
   const defaultTask = {
     title: "",
     description: "",
