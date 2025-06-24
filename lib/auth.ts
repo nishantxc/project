@@ -23,7 +23,7 @@ export function getSupabaseToken(): string | null {
     // Remove prefix and decode in one step
     const base64String = tokenCookie.substring(7); // Remove "base64-" prefix
     const jsonString = Buffer.from(base64String, "base64").toString("utf-8");
-    const session = JSON.parse(jsonString) as SupabaseTokenData;
+    const session = JSON.parse(jsonString)  as SupabaseTokenData;
 
     console.log(session.access_token, "hii");
     

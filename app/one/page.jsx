@@ -38,18 +38,18 @@ const SorryPage = () => {
     
     // Add some playful feedback
     if (clickCount === 2) {
-      alert("Come on, you know you want to forgive me! 😘");
+      alert("Come on, you know you want to forgive me! ");
     } else if (clickCount === 5) {
-      alert("I'll keep trying until you say yes! 💕");
+      alert("I'll keep trying until you say yes! ");
     } else if (clickCount === 8) {
-      alert("You're making this harder than it needs to be! 😅");
+      alert("You're making this harder than it needs to be! ");
     }
   };
 
   const handleYesClick = () => {
     setShowHearts(true);
     setTimeout(() => {
-      alert("Thank you for forgiving me! I love you so much! 💕");
+      alert("Thank you for forgiving me! I love you so much! ");
       setShowPopup(false);
       setShowHearts(false);
       setClickCount(0);

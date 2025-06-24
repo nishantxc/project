@@ -43,7 +43,7 @@ export default function BoardColumn({
           column.id
         )}`}
       >
-        <div className="flex items-center space-x-2 overflow-hidden">
+        <div className="sticky top-0 flex items-center space-x-2 overflow-hidden">
           <span
             className={`font-bold px-2 bg-white/50 rounded-full ${getColumnColor(
               column.id
@@ -69,7 +69,7 @@ export default function BoardColumn({
 
       <div
         ref={setNodeRef}
-        className={`space-y-3 overflow-y-scroll h-[5vh] flex-1 p-1 rounded-lg -z-1 ${
+        className={`space-y-3 h-[5vh] flex-1 p-1 rounded-lg -z-1 ${
           isOver ? "bg-blue-50" : ""
         }`}
       >

@@ -20,7 +20,7 @@ export default function Header({ user }: HeaderProps) {
   };
 
   return (
-    <div className="relative h-16 border-b bg-white flex items-center justify-between px-6">
+    <div className="relative h-16 border-b bg-white flex items-center justify-between p-6">
       {toggleSignoutModal && <LogoutModal onCancel={handleCancel} />}
       <div className="relative">
         <Search className="w-4 h-4 text-gray-400 absolute left-3 top-1/2 transform -translate-y-1/2" />
