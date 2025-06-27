@@ -7,7 +7,7 @@ import TaskModal from "./TaskModal";
 import { DragOverlay, useDroppable } from "@dnd-kit/core";
 import { Member } from "@/types/apiTypes";
 
-export default function BoardColumn({
+export default function BoardColumn({    
   column,
   tasks,
   onAddTask,

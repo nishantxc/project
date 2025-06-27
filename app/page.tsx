@@ -1,5 +1,5 @@
 "use client";
-
+ 
 export const dynamic = "force-dynamic";
 
 import AddMemberModal from "@/components/AddMemberModal";
@@ -146,7 +146,7 @@ export default function KanbanBoard() {
           </div>
 
           {/* Tabs */}
-          <Tabs defaultValue="board" className="mt-6">
+          <Tabs defaultValue="board" className="mt-6 overflow-scroll">
             <TabsList className="bg-transparent border-b rounded-none w-full justify-start space-x-6">
               <TabsTrigger
                 disabled={true}
