@@ -1,13 +1,13 @@
-import { useState, useEffect } from "react";
-import { Task, TaskModalProps, User } from "@/types/kanban";
+import { api } from "@/app/api/api-collection";
+import { handleApiError } from "@/app/api/errors";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogFooter,
   DialogHeader,
   DialogTitle,
-  DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -17,11 +17,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import ReactQuill from "react-quill";
-import "react-quill/dist/quill.snow.css"; 
-import { api } from "@/app/api/api-collection";
-import { handleApiError } from "@/app/api/errors";
 import { Member } from "@/types/apiTypes";
+import { Task, TaskModalProps } from "@/types/kanban";
+import dynamic from "next/dynamic";
+import { useEffect, useState } from "react";
+import "react-quill/dist/quill.snow.css";
+
+const ReactQuill = dynamic(() => import("react-quill"), { ssr: false });
 
 export default function TaskModal({
   isOpen,
@@ -49,6 +51,25 @@ export default function TaskModal({
     assignees: task?.assignees || [],
     kanban_column: task?.kanban_column || columnId,
   });
+
+  const [openAssigneeSelect, setOpenAssigneeSelect] = useState(false);
+  const [assigneeData, setAssigneeData] = useState<Member[]>([]);
+
+  const fetchAssignees = async()=>{
+    try{
+      const response = await api.members.getAll();
+      console.log('Fetched assignees:', response);
+      setAssigneeData(response.members);
+      // return response.members;
+    }catch(err){
+      console.error('Failed to fetch assignees:', err);
+      return [];
+    }
+  }
+
+  useEffect(()=> {
+    fetchAssignees()
+  },[])
 
   useEffect(() => {
     if (isOpen) {
@@ -114,6 +135,23 @@ export default function TaskModal({
       ...prev,
       [name]: value,
     }));
+  };
+
+  const handleAssigneeChange = (assigneeId: string) => {
+    setFormValues((prev) => {
+      const currentAssignees = prev.assignees || [];
+      if (currentAssignees.includes(assigneeId)) {
+        return {
+          ...prev,
+          assignees: currentAssignees.filter((id) => id !== assigneeId),
+        };
+      } else {
+        return {
+          ...prev,
+          assignees: [...currentAssignees, assigneeId],
+        };
+      }
+    });
   };
 
   // Quill modules configuration
@@ -212,6 +250,79 @@ export default function TaskModal({
                 </Select>
               </div>
             </div>
+
+            <div className="grid gap-2">
+                <Label htmlFor="tagType">Assignee</Label>
+                <Select
+                  value={formValues.tagType}
+                  onValueChange={(value) =>
+                    handleAssigneeChange(value)
+                  }
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select style" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {
+                      assigneeData.map((assignee) => (
+                        <SelectItem key={assignee.id} value={assignee.id}>
+                          {assignee.name}
+                        </SelectItem>
+                      ))
+                    }
+                  </SelectContent>
+                </Select>
+              </div>
+
+            {/* <div className="grid gap-2">
+              <Label htmlFor="assignees">Assignees</Label>
+              <Popover open={openAssigneeSelect} onOpenChange={setOpenAssigneeSelect}>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant="outline"
+                    role="combobox"
+                    aria-expanded={openAssigneeSelect}
+                    className="w-full justify-between"
+                  >
+                    {assigneeData.length > 0
+                      ? assigneeData
+                          .map(
+                            (assigneeId) =>
+                              users.find((user) => user.id === assigneeId.id)?.name
+                          )
+                          .filter(Boolean)
+                          .join(", ")
+                      : "Select assignees..."}
+                    <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                  <Command>
+                    <CommandInput placeholder="Search assignees..." />
+                    <CommandEmpty>No assignees found.</CommandEmpty>
+                    <CommandGroup>
+                      {users.map((user) => (
+                        <CommandItem
+                          key={user.id}
+                          value={user.name}
+                          onSelect={() => handleAssigneeChange(user.id)}
+                        >
+                          <Check
+                            // className={cn(
+                            //   "mr-2 h-4 w-4",
+                            //   assigneeData.includes(user.id)
+                            //     ? "opacity-100"
+                            //     : "opacity-0"
+                            // )}
+                          />
+                          {user.name}
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </Command>
+                </PopoverContent>
+              </Popover>
+            </div> */}
 
             <div className="grid gap-2">
               <Label htmlFor="progress">Progress</Label>

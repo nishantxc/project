@@ -74,7 +74,7 @@ export default function ChatTab({ members }: ChatTabProps) {
       .subscribe((status) => {
         if (status === "SUBSCRIBED") {
           console.log("Subscribed to real-time updates");
-        } else if (status === "CLOSED" || status === "ERROR") {
+        } else if (status === "CLOSED") {
           setError("Failed to subscribe to real-time updates");
           console.error("Subscription failed:", status);
         }

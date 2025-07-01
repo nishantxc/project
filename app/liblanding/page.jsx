@@ -75,7 +75,7 @@ const StarField = () => {
       style={{ background: 'radial-gradient(ellipse at center, rgba(147, 51, 234, 0.1) 0%, rgba(3, 7, 18, 1) 70%)' }}
     />
   );
-};
+      };
 
 const AnimatedSection = ({ children, className = "", delay = 0 }) => {
   const ref = useRef(null);
@@ -132,7 +132,7 @@ const LibLanding = () => {
         transition={{ duration: 0.8, ease: "easeOut" }}
         className="shadow-xl shadow-white/5 fixed w-full py-6 px-4 sm:px-12 flex justify-between items-center border-b border-gray-800 backdrop-blur-sm z-50"
       >
-        <motion.h1 
+        <motion.h1       
           className="text-2xl font-bold text-white cursor-pointer"
           whileHover={{ scale: 1.05 }}
           transition={{ type: "spring", stiffness: 300 }}

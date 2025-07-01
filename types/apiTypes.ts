@@ -1,6 +1,6 @@
 // Define types
 export interface Task {
-  id?: string;
+  id: string;
   title: string;
   description: string;
   tag: string;
