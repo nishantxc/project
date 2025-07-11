@@ -57,7 +57,7 @@ interface TaskDrawerProps {
   users: Member[];
   onAddComment: (taskId: string, comment: string) => void;
   onAssignUser: (taskId: string, userId: string) => void;
-  onAddSubtask: (taskId: string, subtask: { title: string; assigneeId?: string }) => void;
+  // onAddSubtask: (taskId: string, subtask: { title: string; assigneeId?: string }) => void;
 }
 
 export default function TaskDrawer({
@@ -67,7 +67,7 @@ export default function TaskDrawer({
   users,
   onAddComment,
   onAssignUser,
-  onAddSubtask,
+  // onAddSubtask,
 }: TaskDrawerProps) {
   const [activeTab, setActiveTab] = useState("details");
   const [commentText, setCommentText] = useState("");
@@ -103,7 +103,7 @@ export default function TaskDrawer({
 
   const handleAddSubtask = () => {
     if (subtaskTitle.trim()) {
-      onAddSubtask(task.id, { title: subtaskTitle, assigneeId: subtaskAssigneeId });
+      // onAddSubtask(task.id, { title: subtaskTitle, assigneeId: subtaskAssigneeId });
       setSubtaskTitle("");
       setSubtaskAssigneeId(undefined);
       setIsSubtaskModalOpen(false);
