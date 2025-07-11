@@ -1,5 +1,5 @@
 // components/Header.tsx
-import { Search, Settings, Bell, LogOut } from "lucide-react";
+import { Search, Settings, Bell, LogOut, ShoppingBag } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { useState } from "react";
 import LogoutModal from "./LogoutModal";
@@ -17,6 +17,10 @@ export default function Header({ user }: HeaderProps) {
 
   const handleCancel = () => {
     setToggleSignoutModal(false);
+  };
+
+  const handleShoppingBag = () => {
+    console.log('Shopping Bag');
   };
 
   return (
@@ -39,8 +43,8 @@ export default function Header({ user }: HeaderProps) {
           <LogOut className="w-4 h-4" />
         </button>
         <div className="relative">
-          <button className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
-            <Bell className="w-4 h-4" />
+          <button onClick={handleShoppingBag} className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center text-gray-600 hover:bg-gray-200">
+            <ShoppingBag className="w-4 h-4" />
           </button>
           <span className="absolute top-0 right-0 w-2 h-2 rounded-full bg-red-500"></span>
         </div>

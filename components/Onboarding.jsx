@@ -1,3 +1,5 @@
+import { api } from '@/app/api/api-collection';
+import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
 
 const Onboarding = () => {
@@ -6,8 +8,12 @@ const Onboarding = () => {
     lastName: '',
     email: '',
     password: '',
-    companyChoice: '' // 'join' or 'create'
+    company_code: '',
+    role: '',
+    companyChoice: ''
   });
+
+  const router = useRouter();
 
   const [step, setStep] = useState(1);
 
@@ -27,10 +33,25 @@ const Onboarding = () => {
     setStep(3);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async(e) => {
     e.preventDefault();
-    // Handle form submission logic here
-    console.log('Form submitted:', formData);
+    const newForm = {
+      name: formData.firstName + ' ' + formData.lastName,
+      email: formData.email,
+      role: formData.role,
+      company_code: formData.company_code
+    }
+
+    try {
+      // Use the API collection instead of direct fetch
+      const response = await api.members.create(newForm);
+      console.log("Member added successfully:", response);
+      router.push('/');
+    } catch (error) {
+      console.error("Error adding member:", error);
+      setError("Failed to add member. Please try again.");
+    } 
+    console.log('Form submitted:', newForm);
   };
 
   return (
@@ -103,6 +124,20 @@ const Onboarding = () => {
                 />
               </div>
             </div>
+            <div>
+              <label htmlFor="role" className="block text-sm font-medium text-gray-700">
+                Role
+              </label>
+              <input
+                id="role"
+                name="role"
+                type="text"
+                required
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                value={formData.role}
+                onChange={handleInputChange}
+              />
+            </div>
             <button
               type="submit"
               className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-blue-600 hover:bg-blue-700"
@@ -138,15 +173,17 @@ const Onboarding = () => {
           <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
             {formData.companyChoice === 'join' ? (
               <div>
-                <label htmlFor="companyCode" className="block text-sm font-medium text-gray-700">
+                <label htmlFor="company_code" className="block text-sm font-medium text-gray-700">
                   Enter Company Code
                 </label>
                 <input
-                  id="companyCode"
-                  name="companyCode"
+                  id="company_code"
+                  name="company_code"
                   type="text"
                   required
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                  value={formData.company_code}
+                  onChange={handleInputChange}
                 />
               </div>
             ) : (

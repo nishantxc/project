@@ -190,16 +190,16 @@ const STHIR = () => {
             </div>
 
             <h1 className="text-6xl md:text-8xl font-bold mb-6 tracking-tight">
-              <span className="block text-black font-amita tracking-wide mb-2">STHIR.</span>
-              <span className="w-full block text-3xl md:text-6xl font-light text-black font-amita lowercase">
-                Rooted in Authenticity
+              <span className="block text-black font-amita tracking-wide mb-6">STHIR</span>
+              <span className="w-full block text-3xl md:text-5xl font-light text-black font-amita lowercase">
+                Rooted. Oversized. Unfiltered.
               </span>
             </h1>
 
-            <p className="text-xl md:text-2xl text-black mb-2 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-black mb-2 max-w-md font-light mx-auto leading-relaxed">
               "sthir" (स्थिर) signifies a state of grounded strength and unwavering presence.
             </p>
-            <p className="text-xl md:text-2xl text-black mb-8 max-w-2xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-black mb-8 max-w-md font-light mx-auto leading-relaxed">
               Where heritage meets modern minimalism. Each piece tells a story of sustainable craftsmanship and timeless design.
             </p>
           </div>

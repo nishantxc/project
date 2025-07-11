@@ -34,7 +34,7 @@ export default function LoginForm() {
       console.log("Auth response:", data);
 
       // After successful login, redirect
-      window.location.href = "/";
+      window.location.href = "/onboarding";
     } catch (error) {
       console.error("Login error:", error);
     }
