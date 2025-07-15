@@ -22,6 +22,6 @@
       "@/*": ["./*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/liblanding/page.jsx", "components/CircularText.jsx"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "app/liblanding/page.jsx", "components/CircularText.jsx", "app/seenly/page.jsx"],
   "exclude": ["node_modules"]
 }
