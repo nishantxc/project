@@ -15,6 +15,7 @@ const SeenlyApp = () => {
     { id: 3, caption: "Small wins today", mood: "Hopeful", reactions: 15 },
   ]);
   const [showCamera, setShowCamera] = useState(false);
+  const [cameraLoading, setCameraLoading] = useState(false);
   const [catMode, setCatMode] = useState(false);
   const [error, setError] = useState('');
   const videoRef = useRef(null);
@@ -59,6 +60,8 @@ const SeenlyApp = () => {
   }, []);
 
   const startCamera = async () => {
+    setCameraLoading(true);
+    setError('');
     try {
       // Try environment-facing camera first
       let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
@@ -68,13 +71,18 @@ const SeenlyApp = () => {
       }
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
-        videoRef.current.play(); // Explicitly trigger play
+        // Retry play with timeout for browser delays
+        videoRef.current.play().catch((err) => {
+          setError('Failed to start video. Try again or check permissions.');
+          console.error('Video play error:', err);
+        });
       }
       setShowCamera(true);
-      setError('');
+      setCameraLoading(false);
     } catch (err) {
       setError('Camera access failed. Please allow camera permissions or check device settings.');
       console.error('Error accessing camera:', err);
+      setCameraLoading(false);
     }
   };
 
@@ -84,18 +92,48 @@ const SeenlyApp = () => {
       const video = videoRef.current;
       const context = canvas.getContext('2d');
 
+      // Check if video is ready
+      if (video.videoWidth === 0 || video.videoHeight === 0) {
+        setError('Camera not ready. Please wait or try again.');
+        console.error('Video dimensions not ready:', video.videoWidth, video.videoHeight);
+        return;
+      }
+
       canvas.width = video.videoWidth;
       canvas.height = video.videoHeight;
       context.drawImage(video, 0, 0);
 
-      const dataURL = canvas.toDataURL('image/jpeg');
-      setPhotoData(dataURL);
-      setShowCamera(false);
+      try {
+        const dataURL = canvas.toDataURL('image/jpeg');
+        if (!dataURL || dataURL === 'data:,') {
+          setError('Failed to capture photo. Try again.');
+          console.error('Invalid canvas data');
+          return;
+        }
+        setPhotoData(dataURL);
+        setShowCamera(false);
 
-      // Stop camera stream
-      const stream = video.srcObject;
+        // Stop camera stream
+        const stream = video.srcObject;
+        stream.getTracks().forEach((track) => track.stop());
+      } catch (err) {
+        setError('Error capturing photo. Please try again.');
+        console.error('Capture error:', err);
+      }
+    } else {
+      setError('Camera or canvas not available. Please try again.');
+      console.error('Missing videoRef or canvasRef');
+    }
+  };
+
+  const cancelCamera = () => {
+    if (videoRef.current?.srcObject) {
+      const stream = videoRef.current.srcObject;
       stream.getTracks().forEach((track) => track.stop());
     }
+    setShowCamera(false);
+    setCameraLoading(false);
+    setError('');
   };
 
   const submitEntry = () => {
@@ -221,16 +259,46 @@ const SeenlyApp = () => {
       <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-square max-w-md mx-auto border-4 border-white shadow-md">
         {showCamera ? (
           <div className="relative">
-            <video ref={videoRef} autoPlay playsInline muted className="w-full h-full object-cover" />
-            <motion.button
-              onClick={capturePhoto}
-              className="absolute bottom-4 left-1/2 transform -translate-x-1/2 w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
-              aria-label="Capture Photo"
-            >
-              📸
-            </motion.button>
+            {cameraLoading ? (
+              <div className="w-full h-full flex items-center justify-center text-gray-500 font-mono">
+                <svg className="animate-spin h-8 w-8 mr-3" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+                </svg>
+                Loading camera...
+              </div>
+            ) : (
+              <>
+                <video
+                  ref={videoRef}
+                  autoPlay
+                  playsInline
+                  muted
+                  className="w-full h-full object-cover"
+                  style={{ minHeight: '200px', minWidth: '200px' }} // Ensure minimum size
+                />
+                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
+                  <motion.button
+                    onClick={capturePhoto}
+                    className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    aria-label="Capture Photo"
+                  >
+                    📸
+                  </motion.button>
+                  <motion.button
+                    onClick={cancelCamera}
+                    className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    aria-label="Cancel Camera"
+                  >
+                    ❌
+                  </motion.button>
+                </div>
+              </>
+            )}
           </div>
         ) : photoData ? (
           <motion.img
