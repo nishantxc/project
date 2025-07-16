@@ -150,7 +150,7 @@ const STHIR = () => {
       {/* Premium Navigation */}
       <nav className="fixed top-0 left-0 right-0 z-40 bg-white/70 backdrop-blur-sm shadow-sm shadow-black">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <div className="text-2xl font-bold tracking-tight">sthir.</div>
+          <div className="text-2xl font-bold tracking-tight font-amita">sthir.</div>
 
           <div className="hidden md:flex space-x-8 text-md">
             <a href="#story" className="hover:text-gray-600 transition-colors">Story</a>

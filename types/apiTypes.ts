@@ -36,3 +36,20 @@ export interface MemberResponse {
 export interface MembersResponse {
   members: Member[];
 }
+
+export interface Company {
+  id: string;
+  name: string;
+  sector: string;
+  size: string;
+  description: string;
+  created_at?: string;
+}
+
+export interface CompanyResponse {
+  company: Company;
+}
+
+export interface CompaniesResponse {
+  companies: Company[];
+}

@@ -2,6 +2,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Book, House, MessageCircle, MessageCircleHeart, Star } from 'lucide-react';
 
 const SeenlyApp = () => {
   const [currentView, setCurrentView] = useState('home');
@@ -158,10 +159,10 @@ const SeenlyApp = () => {
   };
 
   const sharePost = (post) => {
-    const shareText = `"${post.caption}" - This helped me feel less alone today. Check out Seenly 💫`;
+    const shareText = `"${post.caption}" - This helped me feel less alone today. Check out Ibasho 💫`;
     if (navigator.share) {
       navigator.share({
-        title: 'Seenly Moment',
+        title: 'Ibasho Moment',
         text: shareText,
         url: window.location.href,
       }).catch((err) => console.error('Share failed:', err));
@@ -187,11 +188,11 @@ const SeenlyApp = () => {
       <header className="p-6 bg-gradient-to-r from-pink-100/80 to-blue-100/80 backdrop-blur-sm">
         <div className="max-w-4xl mx-auto flex items-center justify-between">
           <motion.h1
-            className="text-3xl font-bold text-gray-800 font-serif"
+            className="text-3xl font-light text-gray-800 font-serif"
             whileHover={{ scale: 1.05 }}
-            aria-label="Seenly Logo"
+            aria-label="Ibasho Logo"
           >
-            Seenly
+            ibasho <span className='text-sm font-light'>(居場所)</span>
           </motion.h1>
 
           <motion.button
@@ -268,16 +269,16 @@ const SeenlyApp = () => {
                 Loading camera...
               </div>
             ) : (
-              <>
+              <>       
                 <video
                   ref={videoRef}
                   autoPlay
                   playsInline
                   muted
-                  className="w-full h-full object-cover"
-                  style={{ minHeight: '200px', minWidth: '200px' }} // Ensure minimum size
+                  className="w-full h-full object-cover"    
+                  style={{ minHeight: '200px', minWidth: '200px' }} 
                 />
-                <div className="absolute bottom-4 left-0 right-0 flex justify-center space-x-4">
+                <div className="flex justify-center space-x-4">
                   <motion.button
                     onClick={capturePhoto}
                     className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
@@ -386,7 +387,7 @@ const SeenlyApp = () => {
             whileTap={{ scale: photoData && caption && moodTag ? 0.95 : 1 }}
             aria-label="Submit Entry"
           >
-            Share this moment
+            Capture this moment
           </motion.button>
         </div>
         {error && <p className="text-red-500 text-sm mt-2 font-mono">{error}</p>}
@@ -490,17 +491,27 @@ const SeenlyApp = () => {
     </motion.div>
   );
 
+  const WhisperPage = () => (
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="mb-8">
+      <h3 className="text-2xl font-serif text-gray-800 mb-6 text-center">Community Whispers</h3>
+      <p className="text-gray-600 text-sm font-mono">
+        Share your feelings and connect with others who share your journey.
+      </p>
+    </motion.div>
+  );
+
   const Navigation = () => (
-    <motion.nav initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex justify-center space-x-4 mb-8">
+    <motion.nav initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="w-full flex flex-col md:flex-row items-center gap-4 mb-8">
       {[
-        { key: 'home', label: 'Check In', icon: '🏠' },
-        { key: 'journal', label: 'Journal', icon: '📖' },
-        { key: 'community', label: 'Community', icon: '🌟' },
+        { key: 'home', label: 'Check In', icon: <House /> },
+        { key: 'journal', label: 'Journal', icon: <Book /> },
+        { key: 'community', label: 'Community', icon: <Star /> },
+        { key: 'whisper', label: 'Whisper', icon: <MessageCircleHeart /> },
       ].map((item) => (
         <motion.button
           key={item.key}
           onClick={() => setCurrentView(item.key)}
-          className={`px-6 py-3 rounded-full font-mono text-sm transition-colors ${
+          className={`w-full flex items-center px-6 py-3 rounded-full font-mono text-sm transition-colors ${
             currentView === item.key ? 'bg-pink-200 text-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
           }`}
           whileHover={{ scale: 1.05 }}
@@ -508,7 +519,7 @@ const SeenlyApp = () => {
           aria-label={`Navigate to ${item.label}`}
         >
           <span className="mr-2">{item.icon}</span>
-          {item.label}
+          <span>{item.label}</span>
         </motion.button>
       ))}
     </motion.nav>
@@ -529,6 +540,8 @@ const SeenlyApp = () => {
       {currentView === 'journal' && <JournalTimeline />}
 
       {currentView === 'community' && <MoodboardFeed />}
+
+      {currentView === 'whisper' && <WhisperPage />}
 
       {catMode && (
         <motion.div

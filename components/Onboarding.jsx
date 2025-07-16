@@ -1,6 +1,16 @@
 import { api } from '@/app/api/api-collection';
 import { useRouter } from 'next/navigation';
 import React, { useState } from 'react';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const Onboarding = () => {
   const [formData, setFormData] = useState({
@@ -33,6 +43,42 @@ const Onboarding = () => {
     setStep(3);
   };
 
+  const [showCompanyModal, setShowCompanyModal] = useState(false);
+  const [companyData, setCompanyData] = useState({
+    name: '',
+    sector: '',
+    size: '',
+    description: ''
+  });
+
+  const handleCompanyInputChange = (e) => {
+    const { name, value } = e.target;
+    setCompanyData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleCreateCompany = async () => {
+    try {
+      // Here you would call the API to create a company
+      // For example: await api.companies.create(companyData);
+      console.log('Company data to submit:', companyData);
+      
+      // After successful creation, update the form data with the new company info
+      setFormData(prev => ({
+        ...prev,
+        companyName: companyData.name
+      }));
+      
+      // Close the modal and proceed to the next step
+      setShowCompanyModal(false);
+      setStep(3);
+    } catch (error) {
+      console.error('Error creating company:', error);
+    }
+  };
+
   const handleSubmit = async(e) => {
     e.preventDefault();
     const newForm = {
@@ -42,6 +88,16 @@ const Onboarding = () => {
       company_code: formData.company_code
     }
 
+    // If creating a company, include company data
+    if (formData.companyChoice === 'create') {
+      newForm.company = {
+        name: companyData.name,
+        sector: companyData.sector,
+        size: companyData.size,
+        description: companyData.description
+      };
+    }
+
     try {
       // Use the API collection instead of direct fetch
       const response = await api.members.create(newForm);
@@ -49,7 +105,7 @@ const Onboarding = () => {
       router.push('/');
     } catch (error) {
       console.error("Error adding member:", error);
-      setError("Failed to add member. Please try again.");
+      console.error("Failed to add member. Please try again.");
     } 
     console.log('Form submitted:', newForm);
   };
@@ -160,7 +216,10 @@ const Onboarding = () => {
                 Join a Company
               </button>
               <button
-                onClick={() => handleCompanyChoice('create')}
+                onClick={() => {
+                  handleCompanyChoice('create');
+                  setShowCompanyModal(true);
+                }}
                 className="w-full py-2 px-4 border border-transparent rounded-md shadow-sm text-white bg-purple-600 hover:bg-purple-700"
               >
                 Create a Company
@@ -187,17 +246,47 @@ const Onboarding = () => {
                 />
               </div>
             ) : (
-              <div>
-                <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
-                  Company Name
-                </label>
-                <input
-                  id="companyName"
-                  name="companyName"
-                  type="text"
-                  required
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
-                />
+              <div className="space-y-4">
+                <div>
+                  <label htmlFor="companyName" className="block text-sm font-medium text-gray-700">
+                    Company Name
+                  </label>
+                  <input
+                    id="companyName"
+                    name="companyName"
+                    type="text"
+                    required
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    value={formData.companyName || companyData.name}
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label htmlFor="companySector" className="block text-sm font-medium text-gray-700">
+                    Company Sector
+                  </label>
+                  <input
+                    id="companySector"
+                    name="companySector"
+                    type="text"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    value={companyData.sector}
+                    readOnly
+                  />
+                </div>
+                <div>
+                  <label htmlFor="companySize" className="block text-sm font-medium text-gray-700">
+                    Company Size
+                  </label>
+                  <input
+                    id="companySize"
+                    name="companySize"
+                    type="text"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md"
+                    value={companyData.size}
+                    readOnly
+                  />
+                </div>
               </div>
             )}
             <button
@@ -209,6 +298,94 @@ const Onboarding = () => {
           </form>
         )}
       </div>
+
+      {/* Company Creation Modal */}
+      <Dialog open={showCompanyModal} onOpenChange={setShowCompanyModal}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Create a New Company</DialogTitle>
+            <DialogDescription>
+              Please provide details about your company to get started.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="name" className="text-right text-sm font-medium col-span-1">
+                Name
+              </label>
+              <input
+                id="name"
+                name="name"
+                type="text"
+                className="col-span-3 flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={companyData.name}
+                onChange={handleCompanyInputChange}
+                required
+              />
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="sector" className="text-right text-sm font-medium col-span-1">
+                Sector
+              </label>
+              <Select 
+                name="sector" 
+                value={companyData.sector} 
+                onValueChange={(value) => setCompanyData(prev => ({ ...prev, sector: value }))}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Select a sector" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="technology">Technology</SelectItem>
+                  <SelectItem value="healthcare">Healthcare</SelectItem>
+                  <SelectItem value="finance">Finance</SelectItem>
+                  <SelectItem value="education">Education</SelectItem>
+                  <SelectItem value="retail">Retail</SelectItem>
+                  <SelectItem value="manufacturing">Manufacturing</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="size" className="text-right text-sm font-medium col-span-1">
+                Size
+              </label>
+              <Select 
+                name="size" 
+                value={companyData.size} 
+                onValueChange={(value) => setCompanyData(prev => ({ ...prev, size: value }))}
+              >
+                <SelectTrigger className="col-span-3">
+                  <SelectValue placeholder="Company size" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1-10">1-10 employees</SelectItem>
+                  <SelectItem value="11-50">11-50 employees</SelectItem>
+                  <SelectItem value="51-200">51-200 employees</SelectItem>
+                  <SelectItem value="201-500">201-500 employees</SelectItem>
+                  <SelectItem value="501+">501+ employees</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="description" className="text-right text-sm font-medium col-span-1">
+                Description
+              </label>
+              <textarea
+                id="description"
+                name="description"
+                className="col-span-3 flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm"
+                value={companyData.description}
+                onChange={handleCompanyInputChange}
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowCompanyModal(false)}>Cancel</Button>
+            <Button onClick={handleCreateCompany}>Create Company</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };
