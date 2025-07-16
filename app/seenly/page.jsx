@@ -66,11 +66,10 @@ const SeenlyApp = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
-        isCameraOpen(true);
       }
+      isCameraOpen(true);
     } catch (err) {
       console.error("Camera error:", err);
-      setError('Camera access failed. Please allow camera permissions or check device settings.');
     }
   };
 
@@ -343,7 +342,7 @@ const SeenlyApp = () => {
         {/* )} */}
 
         {/* Button to start camera (if no photo yet and not showing camera) */}
-        {!cameraOpen && (
+        {/* {!cameraOpen && ( */}
           <motion.button
             onClick={startCamera}
             className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
@@ -356,7 +355,7 @@ const SeenlyApp = () => {
               <p className="font-mono">Capture your moment</p>
             </div>
           </motion.button>
-        )}
+        {/* )} */}
       </div>
 
       {/* Hidden canvas for capture */}
