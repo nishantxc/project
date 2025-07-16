@@ -67,6 +67,7 @@ const SeenlyApp = () => {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
+      setShowCamera(true);
     } catch (err) {
       console.error("Camera error:", err);
     }
