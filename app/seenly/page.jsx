@@ -61,6 +61,7 @@ const SeenlyApp = () => {
   }, []);
 
   const startCamera = async () => {
+    console.log('videoRef.start:', videoRef.current);
     setCameraLoading(true);
     setError('');
     try {
@@ -71,8 +72,8 @@ const SeenlyApp = () => {
         stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
       }
       if (videoRef.current) {
+        console.log('videoRef.current:', videoRef.current);
         videoRef.current.srcObject = stream;
-        // Retry play with timeout for browser delays
         videoRef.current.play().catch((err) => {
           setError('Failed to start video. Try again or check permissions.');
           console.error('Video play error:', err);
@@ -256,66 +257,77 @@ const SeenlyApp = () => {
   );
 
   const PhotoCapture = () => (
-    <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-lg shadow-lg p-6 mb-6">
+    <motion.div
+      initial={{ opacity: 0, scale: 0.8 }}
+      animate={{ opacity: 1, scale: 1 }}
+      className="bg-white rounded-lg shadow-lg p-6 mb-6"
+    >
       <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-square max-w-md mx-auto border-4 border-white shadow-md">
-        {/* {showCamera ? ( */}
-        <div className="relative">
-          {cameraLoading ? (
-            <div className="w-full h-full flex items-center justify-center text-gray-500 font-mono">
-              <svg className="animate-spin h-8 w-8 mr-3" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-              </svg>
-              Loading camera...
-            </div>
-          ) : (
-            <>
-              <video
-                ref={videoRef}
-                autoPlay
-                playsInline
-                muted
-                className={`w-full h-full object-cover transition-opacity duration-300 ${showCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
-                  }`} style={{ minHeight: '200px', minWidth: '200px' }}
-              />
-              <div className="flex justify-center space-x-4">
-                <motion.button
-                  onClick={capturePhoto}
-                  className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Capture Photo"
-                >
-                  📸
-                </motion.button>
-                <motion.button
-                  onClick={cancelCamera}
-                  className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  aria-label="Cancel Camera"
-                >
-                  ❌
-                </motion.button>
-              </div>
-            </>
-          )}
-        </div>
-        {/* ) :  */}
-        {photoData && (
-        <motion.img
-          src={photoData}
-          alt="Captured moment"
-          className="w-full h-full object-cover"
-          initial={{ opacity: 0, scale: 1.2 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
-        />)}
-        {!showCamera && (
+        {/* Always render video */}
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          muted
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${showCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
+          style={{ minHeight: '200px', minWidth: '200px' }}
+        />
 
+        {/* If a photo is captured, show it */}
+        {photoData && !showCamera && (
+          <motion.img
+            src={photoData}
+            alt="Captured moment"
+            className="w-full h-full object-cover"
+            initial={{ opacity: 0, scale: 1.2 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+        )}
+
+        {/* If camera is loading */}
+        {cameraLoading && (
+          <div className="absolute inset-0 flex items-center justify-center text-gray-500 font-mono z-10 bg-white/80">
+            <svg className="animate-spin h-8 w-8 mr-3" viewBox="0 0 24 24">
+              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+            </svg>
+            Loading camera...
+          </div>
+        )}
+
+        {/* Controls if camera is on */}
+        {showCamera && !cameraLoading && (
+          <div className="absolute inset-0 flex items-end justify-center pb-4 z-20">
+            <div className="flex space-x-4">
+              <motion.button
+                onClick={capturePhoto}
+                className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Capture Photo"
+              >
+                📸
+              </motion.button>
+              <motion.button
+                onClick={cancelCamera}
+                className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                aria-label="Cancel Camera"
+              >
+                ❌
+              </motion.button>
+            </div>
+          </div>
+        )}
+
+        {/* Button to start camera (if no photo yet and not showing camera) */}
+        {!showCamera && !photoData && !cameraLoading && (
           <motion.button
             onClick={startCamera}
-            className="w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
+            className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
             aria-label="Start Camera"
@@ -328,7 +340,10 @@ const SeenlyApp = () => {
         )}
       </div>
 
+      {/* Hidden canvas for capture */}
       <canvas ref={canvasRef} className="hidden" />
+
+      {/* Error Message */}
       {error && (
         <div className="text-red-500 text-sm mt-2 font-mono">
           {error}
@@ -343,6 +358,7 @@ const SeenlyApp = () => {
       )}
     </motion.div>
   );
+
 
   const CheckInForm = () => {
     const moodOptions = ['Grateful', 'Raw', 'Hopeful', 'Calm', 'Overwhelmed'];
@@ -449,10 +465,10 @@ const SeenlyApp = () => {
             <div className="flex items-center justify-between mb-4">
               <span
                 className={`px-3 py-1 rounded-full text-sm font-mono ${post.mood === 'Grateful'
-                  ? 'bg-green-100 text-green-800'
-                  : post.mood === 'Raw'
-                    ? 'bg-red-100 text-red-800'
-                    : 'bg-blue-100 text-blue-800'
+                    ? 'bg-green-100 text-green-800'
+                    : post.mood === 'Raw'
+                      ? 'bg-red-100 text-red-800'
+                      : 'bg-blue-100 text-blue-800'
                   }`}
               >
                 {post.mood}
