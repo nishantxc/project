@@ -60,33 +60,38 @@ const SeenlyApp = () => {
     }
   }, []);
 
-  const startCamera = async () => {
-    console.log('videoRef.start:', videoRef.current);
-    setCameraLoading(true);
-    setError('');
-    try {
-      // Try environment-facing camera first
-      let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-      if (!stream) {
-        // Fallback to user-facing camera
-        stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
-      }
-      if (videoRef.current) {
-        console.log('videoRef.current:', videoRef.current);
-        videoRef.current.srcObject = stream;
-        videoRef.current.play().catch((err) => {
-          setError('Failed to start video. Try again or check permissions.');
-          console.error('Video play error:', err);
-        });
-      }
-      setShowCamera(true);
-      setCameraLoading(false);
-    } catch (err) {
-      setError('Camera access failed. Please allow camera permissions or check device settings.');
-      console.error('Error accessing camera:', err);
-      setCameraLoading(false);
+const startCamera = async () => {
+  console.log('videoRef.start:', videoRef.current);
+  setCameraLoading(true);
+  setError('');
+  try {
+    let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+
+    if (videoRef.current) {
+      videoRef.current.srcObject = stream;
+
+      videoRef.current.onloadedmetadata = () => {
+        videoRef.current
+          .play()
+          .then(() => {
+            console.log('Camera started successfully');
+          })
+          .catch((err) => {
+            setError('Failed to start video. Try again or check permissions.');
+            console.error('Video play error:', err);
+          });
+      };
     }
-  };
+
+    setShowCamera(true);
+    setCameraLoading(false);
+  } catch (err) {
+    setError('Camera access failed. Please allow camera permissions or check device settings.');
+    console.error('Error accessing camera:', err);
+    setCameraLoading(false);
+  }
+};
+
 
   const capturePhoto = () => {
     if (videoRef.current && canvasRef.current) {
@@ -465,10 +470,10 @@ const SeenlyApp = () => {
             <div className="flex items-center justify-between mb-4">
               <span
                 className={`px-3 py-1 rounded-full text-sm font-mono ${post.mood === 'Grateful'
-                    ? 'bg-green-100 text-green-800'
-                    : post.mood === 'Raw'
-                      ? 'bg-red-100 text-red-800'
-                      : 'bg-blue-100 text-blue-800'
+                  ? 'bg-green-100 text-green-800'
+                  : post.mood === 'Raw'
+                    ? 'bg-red-100 text-red-800'
+                    : 'bg-blue-100 text-blue-800'
                   }`}
               >
                 {post.mood}
