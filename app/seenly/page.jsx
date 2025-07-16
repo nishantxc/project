@@ -316,7 +316,7 @@ const SeenlyApp = () => {
         )}
 
         {/* Controls if camera is on */}
-        {showCamera && (
+        {/* {showCamera && ( */}
           <div className="absolute inset-0 flex items-end justify-center pb-4 z-20">
             <div className="flex space-x-4">
               <motion.button
@@ -328,7 +328,7 @@ const SeenlyApp = () => {
               >
                 📸
               </motion.button>
-              <motion.button
+              {/* <motion.button
                 onClick={cancelCamera}
                 className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
@@ -336,13 +336,13 @@ const SeenlyApp = () => {
                 aria-label="Cancel Camera"
               >
                 ❌
-              </motion.button>
+              </motion.button> */}
             </div>
           </div>
-        )}
+        {/* )} */}
 
         {/* Button to start camera (if no photo yet and not showing camera) */}
-        {!showCamera && (
+        {/* {!showCamera && ( */}
           <motion.button
             onClick={startCamera}
             className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
@@ -355,7 +355,7 @@ const SeenlyApp = () => {
               <p className="font-mono">Capture your moment</p>
             </div>
           </motion.button>
-        )}
+        {/* )} */}
       </div>
 
       {/* Hidden canvas for capture */}
