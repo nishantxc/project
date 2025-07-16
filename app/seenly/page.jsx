@@ -60,37 +60,48 @@ const SeenlyApp = () => {
     }
   }, []);
 
-const startCamera = async () => {
-  console.log('videoRef.start:', videoRef.current);
-  setCameraLoading(true);
-  setError('');
-  try {
-    let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-
-    if (videoRef.current) {
-      videoRef.current.srcObject = stream;
-
-      videoRef.current.onloadedmetadata = () => {
-        videoRef.current
-          .play()
-          .then(() => {
-            console.log('Camera started successfully');
-          })
-          .catch((err) => {
-            setError('Failed to start video. Try again or check permissions.');
-            console.error('Video play error:', err);
-          });
-      };
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        await videoRef.current.play();
+      }
+    } catch (err) {
+      console.error("Camera error:", err);
     }
+  };
 
-    setShowCamera(true);
-    setCameraLoading(false);
-  } catch (err) {
-    setError('Camera access failed. Please allow camera permissions or check device settings.');
-    console.error('Error accessing camera:', err);
-    setCameraLoading(false);
-  }
-};
+  // const startCamera = async () => {
+  //   setCameraLoading(true);
+  //   setError('');
+  //   try {
+  //     let stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
+
+  //     if (videoRef.current) {
+  //       videoRef.current.srcObject = stream;
+
+  //       videoRef.current.onloadedmetadata = () => {
+  //         videoRef.current
+  //           .play()
+  //           .then(() => {
+  //             console.log('Camera started successfully');
+  //           })
+  //           .catch((err) => {
+  //             setError('Failed to start video. Try again or check permissions.');
+  //             console.error('Video play error:', err);
+  //           });
+  //       };
+  //     }
+
+  //     setShowCamera(true);
+  //     setCameraLoading(false);
+  //   } catch (err) {
+  //     setError('Camera access failed. Please allow camera permissions or check device settings.');
+  //     console.error('Error accessing camera:', err);
+  //     setCameraLoading(false);
+  //   }
+  // };
 
 
   const capturePhoto = () => {
@@ -274,8 +285,7 @@ const startCamera = async () => {
           autoPlay
           playsInline
           muted
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${showCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300`}
           style={{ minHeight: '200px', minWidth: '200px' }}
         />
 
