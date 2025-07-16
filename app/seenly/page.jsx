@@ -258,59 +258,61 @@ const SeenlyApp = () => {
   const PhotoCapture = () => (
     <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} className="bg-white rounded-lg shadow-lg p-6 mb-6">
       <div className="relative bg-gray-100 rounded-lg overflow-hidden aspect-square max-w-md mx-auto border-4 border-white shadow-md">
-        {showCamera ? (
-          <div className="relative">
-            {cameraLoading ? (
-              <div className="w-full h-full flex items-center justify-center text-gray-500 font-mono">
-                <svg className="animate-spin h-8 w-8 mr-3" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
-                </svg>
-                Loading camera...
+        {/* {showCamera ? ( */}
+        <div className="relative">
+          {cameraLoading ? (
+            <div className="w-full h-full flex items-center justify-center text-gray-500 font-mono">
+              <svg className="animate-spin h-8 w-8 mr-3" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" />
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z" />
+              </svg>
+              Loading camera...
+            </div>
+          ) : (
+            <>
+              <video
+                ref={videoRef}
+                autoPlay
+                playsInline
+                muted
+                className={`w-full h-full object-cover transition-opacity duration-300 ${showCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
+                  }`} style={{ minHeight: '200px', minWidth: '200px' }}
+              />
+              <div className="flex justify-center space-x-4">
+                <motion.button
+                  onClick={capturePhoto}
+                  className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Capture Photo"
+                >
+                  📸
+                </motion.button>
+                <motion.button
+                  onClick={cancelCamera}
+                  className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  aria-label="Cancel Camera"
+                >
+                  ❌
+                </motion.button>
               </div>
-            ) : (
-              <>       
-                <video
-                  ref={videoRef}
-                  autoPlay
-                  playsInline
-                  muted
-                  className="w-full h-full object-cover"    
-                  style={{ minHeight: '200px', minWidth: '200px' }} 
-                />
-                <div className="flex justify-center space-x-4">
-                  <motion.button
-                    onClick={capturePhoto}
-                    className="w-16 h-16 bg-white rounded-full shadow-lg flex items-center justify-center"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    aria-label="Capture Photo"
-                  >
-                    📸
-                  </motion.button>
-                  <motion.button
-                    onClick={cancelCamera}
-                    className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    aria-label="Cancel Camera"
-                  >
-                    ❌
-                  </motion.button>
-                </div>
-              </>
-            )}
-          </div>
-        ) : photoData ? (
-          <motion.img
-            src={photoData}
-            alt="Captured moment"
-            className="w-full h-full object-cover"
-            initial={{ opacity: 0, scale: 1.2 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5 }}
-          />
-        ) : (
+            </>
+          )}
+        </div>
+        {/* ) :  */}
+        {photoData && (
+        <motion.img
+          src={photoData}
+          alt="Captured moment"
+          className="w-full h-full object-cover"
+          initial={{ opacity: 0, scale: 1.2 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.5 }}
+        />)}
+        {!showCamera && (
+
           <motion.button
             onClick={startCamera}
             className="w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
@@ -446,13 +448,12 @@ const SeenlyApp = () => {
           >
             <div className="flex items-center justify-between mb-4">
               <span
-                className={`px-3 py-1 rounded-full text-sm font-mono ${
-                  post.mood === 'Grateful'
-                    ? 'bg-green-100 text-green-800'
-                    : post.mood === 'Raw'
+                className={`px-3 py-1 rounded-full text-sm font-mono ${post.mood === 'Grateful'
+                  ? 'bg-green-100 text-green-800'
+                  : post.mood === 'Raw'
                     ? 'bg-red-100 text-red-800'
                     : 'bg-blue-100 text-blue-800'
-                }`}
+                  }`}
               >
                 {post.mood}
               </span>
@@ -511,9 +512,8 @@ const SeenlyApp = () => {
         <motion.button
           key={item.key}
           onClick={() => setCurrentView(item.key)}
-          className={`w-full flex items-center px-6 py-3 rounded-full font-mono text-sm transition-colors ${
-            currentView === item.key ? 'bg-pink-200 text-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
-          }`}
+          className={`w-full flex items-center px-6 py-3 rounded-full font-mono text-sm transition-colors ${currentView === item.key ? 'bg-pink-200 text-gray-800' : 'bg-white text-gray-600 hover:bg-gray-50'
+            }`}
           whileHover={{ scale: 1.05 }}
           whileTap={{ scale: 0.95 }}
           aria-label={`Navigate to ${item.label}`}
