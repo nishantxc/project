@@ -286,7 +286,9 @@ const SeenlyApp = () => {
           autoPlay
           playsInline
           muted
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300`}
+          // className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${showCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
+            }`}
           style={{ minHeight: '200px', minWidth: '200px' }}
         />
 
