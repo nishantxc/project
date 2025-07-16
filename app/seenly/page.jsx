@@ -316,7 +316,7 @@ const SeenlyApp = () => {
         )}
 
         {/* Controls if camera is on */}
-        {showCamera && !cameraLoading && (
+        {showCamera && (
           <div className="absolute inset-0 flex items-end justify-center pb-4 z-20">
             <div className="flex space-x-4">
               <motion.button
@@ -342,7 +342,7 @@ const SeenlyApp = () => {
         )}
 
         {/* Button to start camera (if no photo yet and not showing camera) */}
-        {!showCamera && !photoData && !cameraLoading && (
+        {!showCamera && (
           <motion.button
             onClick={startCamera}
             className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
