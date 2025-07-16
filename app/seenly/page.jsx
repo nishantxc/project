@@ -15,7 +15,7 @@ const SeenlyApp = () => {
     { id: 2, caption: "Struggling but still here", mood: "Raw", reactions: 8 },
     { id: 3, caption: "Small wins today", mood: "Hopeful", reactions: 15 },
   ]);
-  const [showCamera, setShowCamera] = useState(false);
+  const [cameraOpen, isCameraOpen] = useState(false);
   const [cameraLoading, setCameraLoading] = useState(false);
   const [catMode, setCatMode] = useState(false);
   const [error, setError] = useState('');
@@ -51,7 +51,7 @@ const SeenlyApp = () => {
         stream.getTracks().forEach((track) => track.stop());
       }
     };
-  }, [showCamera]);
+  }, [cameraOpen]);
 
   // HTTPS check for dev
   useEffect(() => {
@@ -66,10 +66,11 @@ const SeenlyApp = () => {
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
+        isCameraOpen(true);
       }
-      setShowCamera(true);
     } catch (err) {
       console.error("Camera error:", err);
+      setError('Camera access failed. Please allow camera permissions or check device settings.');
     }
   };
 
@@ -95,7 +96,7 @@ const SeenlyApp = () => {
   //       };
   //     }
 
-  //     setShowCamera(true);
+  //     isCameraOpen(true);
   //     setCameraLoading(false);
   //   } catch (err) {
   //     setError('Camera access failed. Please allow camera permissions or check device settings.');
@@ -130,7 +131,7 @@ const SeenlyApp = () => {
           return;
         }
         setPhotoData(dataURL);
-        setShowCamera(false);
+        isCameraOpen(false);
 
         // Stop camera stream
         const stream = video.srcObject;
@@ -150,7 +151,7 @@ const SeenlyApp = () => {
       const stream = videoRef.current.srcObject;
       stream.getTracks().forEach((track) => track.stop());
     }
-    setShowCamera(false);
+    isCameraOpen(false);
     setCameraLoading(false);
     setError('');
   };
@@ -287,13 +288,13 @@ const SeenlyApp = () => {
           playsInline
           muted
           // className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${showCamera ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${cameraOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
             }`}
           style={{ minHeight: '200px', minWidth: '200px' }}
         />
 
         {/* If a photo is captured, show it */}
-        {photoData && !showCamera && (
+        {photoData && !cameraOpen && (
           <motion.img
             src={photoData}
             alt="Captured moment"
@@ -316,7 +317,7 @@ const SeenlyApp = () => {
         )}
 
         {/* Controls if camera is on */}
-        {/* {showCamera && ( */}
+        {/* {cameraOpen && ( */}
           <div className="absolute inset-0 flex items-end justify-center pb-4 z-20">
             <div className="flex space-x-4">
               <motion.button
@@ -328,7 +329,7 @@ const SeenlyApp = () => {
               >
                 📸
               </motion.button>
-              {/* <motion.button
+              <motion.button
                 onClick={cancelCamera}
                 className="w-16 h-16 bg-red-200 rounded-full shadow-lg flex items-center justify-center"
                 whileHover={{ scale: 1.1 }}
@@ -336,13 +337,13 @@ const SeenlyApp = () => {
                 aria-label="Cancel Camera"
               >
                 ❌
-              </motion.button> */}
+              </motion.button>
             </div>
           </div>
         {/* )} */}
 
         {/* Button to start camera (if no photo yet and not showing camera) */}
-        {/* {!showCamera && ( */}
+        {!cameraOpen && (
           <motion.button
             onClick={startCamera}
             className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
@@ -355,7 +356,7 @@ const SeenlyApp = () => {
               <p className="font-mono">Capture your moment</p>
             </div>
           </motion.button>
-        {/* )} */}
+        )}
       </div>
 
       {/* Hidden canvas for capture */}
