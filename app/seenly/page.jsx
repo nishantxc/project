@@ -62,13 +62,13 @@ const SeenlyApp = () => {
 
   const startCamera = async () => {
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         await videoRef.current.play();
       }
       isCameraOpen(true);
-    } catch (err) {
+    } catch (err) {  
       console.error("Camera error:", err);
     }
   };
@@ -286,9 +286,9 @@ const SeenlyApp = () => {
           autoPlay
           playsInline
           muted
-          // className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300`}
-          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${cameraOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
-            }`}
+          className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300`}
+          // className={`absolute inset-0 w-full h-full object-cover transition-opacity duration-300 ${cameraOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
+          //   }`}
           style={{ minHeight: '200px', minWidth: '200px' }}
         />
 
@@ -342,7 +342,7 @@ const SeenlyApp = () => {
         {/* )} */}
 
         {/* Button to start camera (if no photo yet and not showing camera) */}
-        {/* {!cameraOpen && ( */}
+        {!cameraOpen && ( 
           <motion.button
             onClick={startCamera}
             className="absolute inset-0 w-full h-full flex items-center justify-center text-gray-500 hover:text-gray-700 transition-colors"
@@ -355,7 +355,7 @@ const SeenlyApp = () => {
               <p className="font-mono">Capture your moment</p>
             </div>
           </motion.button>
-        {/* )} */}
+        )} 
       </div>
 
       {/* Hidden canvas for capture */}
