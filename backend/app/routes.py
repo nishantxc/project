@@ -135,7 +135,7 @@ def get_members():
 
 @api.route('/members', methods=['POST'])
 @auth_required
-@cross_origin(origins=["http://localhost:3000"], supports_credentials=True, methods=["POST"], allow_headers=["Content-Type", "Authorization"])
+@cross_origin(origins=["http://localhost:3000", "http://localhost:3000", "https://project-ten-flax-62.vercel.app"], supports_credentials=True, methods=["POST"], allow_headers=["Content-Type", "Authorization"])
 def create_member():
     """Create a new member for the authenticated user"""
     token = request.headers.get('Authorization').split(" ")[1]

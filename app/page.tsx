@@ -134,14 +134,14 @@ export default function KanbanBoard() {
                   </div>
                 )}
               </div>
-              <Button
+              {/* <Button
                 variant="outline"
                 size="sm"
                 className="border border-blue-500 text-blue-500 hover:bg-blue-50"
                 onClick={() => handleAddMember()}
               >
                 + Add Member
-              </Button>
+              </Button> */}
             </div>
           </div>
 

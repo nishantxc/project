@@ -7,6 +7,8 @@ import {
   TasksResponse,
   Task,
   TaskResponse,
+  Company,
+  CompanyResponse,
 } from "@/types/apiTypes";
 import { apiMethods } from "./api-methods";
 import { createSupabaseClient } from "@/lib/supabase";
@@ -118,4 +120,22 @@ export const api = {
       );
     },
   },
+  company: {
+    getAll: async (): Promise<CompanyResponse> => {
+      const token = await getAuthToken();
+      if (!token) throw new Error("Authentication required");
+
+      return apiMethods.get<CompanyResponse>(`${API_BASE_URL}/api/company`, token);
+    },
+  },
+    create: async (companyData: Omit<Company, "id">): Promise<CompanyResponse> => {
+      const token = await getAuthToken();
+      if (!token) throw new Error("Authentication required");
+
+      return apiMethods.post<CompanyResponse>(
+        `${API_BASE_URL}/api/company`,
+        companyData,
+        token
+      );
+    },
 };

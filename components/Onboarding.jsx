@@ -64,13 +64,13 @@ const Onboarding = () => {
       // Here you would call the API to create a company
       // For example: await api.companies.create(companyData);
       console.log('Company data to submit:', companyData);
-      
+
       // After successful creation, update the form data with the new company info
       setFormData(prev => ({
         ...prev,
         companyName: companyData.name
       }));
-      
+
       // Close the modal and proceed to the next step
       setShowCompanyModal(false);
       setStep(3);
@@ -79,7 +79,7 @@ const Onboarding = () => {
     }
   };
 
-  const handleSubmit = async(e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const newForm = {
       name: formData.firstName + ' ' + formData.lastName,
@@ -90,23 +90,33 @@ const Onboarding = () => {
 
     // If creating a company, include company data
     if (formData.companyChoice === 'create') {
-      newForm.company = {
+      const newCompanyData = {
         name: companyData.name,
         sector: companyData.sector,
         size: companyData.size,
         description: companyData.description
       };
-    }
+      try {
+        const response = await api.company.create(newCompanyData);
+        console.log("Company added successfully:", response);                           
+        router.push('/');
+      } catch (error) {
+        console.error("Error adding member:", error);
+        console.error("Failed to add member. Please try again.");
+      }
 
-    try {
-      // Use the API collection instead of direct fetch
-      const response = await api.members.create(newForm);
-      console.log("Member added successfully:", response);
-      router.push('/');
-    } catch (error) {
-      console.error("Error adding member:", error);
-      console.error("Failed to add member. Please try again.");
-    } 
+      
+    } else {
+      try {
+        // Use the API collection instead of direct fetch
+        const response = await api.members.create(newForm);
+        console.log("Member added successfully:", response);
+        router.push('/');
+      } catch (error) {
+        console.error("Error adding member:", error);
+        console.error("Failed to add member. Please try again.");
+      }
+    }
     console.log('Form submitted:', newForm);
   };
 
@@ -327,9 +337,9 @@ const Onboarding = () => {
               <label htmlFor="sector" className="text-right text-sm font-medium col-span-1">
                 Sector
               </label>
-              <Select 
-                name="sector" 
-                value={companyData.sector} 
+              <Select
+                name="sector"
+                value={companyData.sector}
                 onValueChange={(value) => setCompanyData(prev => ({ ...prev, sector: value }))}
               >
                 <SelectTrigger className="col-span-3">
@@ -350,9 +360,9 @@ const Onboarding = () => {
               <label htmlFor="size" className="text-right text-sm font-medium col-span-1">
                 Size
               </label>
-              <Select 
-                name="size" 
-                value={companyData.size} 
+              <Select
+                name="size"
+                value={companyData.size}
                 onValueChange={(value) => setCompanyData(prev => ({ ...prev, size: value }))}
               >
                 <SelectTrigger className="col-span-3">
