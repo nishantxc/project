@@ -12,7 +12,7 @@ def create_app():
     # Enable CORS with proper configuration
     CORS(app, resources={
         r"/api/*": {
-            "origins": ["http://localhost:3000"],  # Update with your frontend origin
+            "origins": ["http://localhost:3000", "https://project-ten-flax-62.vercel.app"],  # Update with your frontend origin
             "allow_headers": ["Authorization", "Content-Type"],
             "methods": ["GET", "POST", "PUT", "DELETE"],
             "supports_credentials": True
